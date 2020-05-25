@@ -10,7 +10,7 @@ public class ReadFile {
           System.out.println("file too big...");
           return null;
 	  }
-	  FileInputStream fi = new FileInputStream(file);  
+	  InputStream fi = new FileInputStream(file);  
 	  int offset = 0;
       int numRead = 0;
       while (offset < buffer.length

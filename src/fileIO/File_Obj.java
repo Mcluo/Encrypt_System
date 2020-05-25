@@ -21,9 +21,17 @@ public File_Obj() throws IOException{
 	Mtobyte = f1.getContent(encrypt_frame.InputFile.getText());//获得文件的字节流//read()读出来的是有符号的整形
 	Mtextbi=byteArrayToBinaryintArray(Mtobyte);//将字节流转换成二进制流（8的倍数）
 	M_len = Mtextbi.length;//明文二进制串的长度
+	/**
+	 * 测试输出
+	 */
+	System.out.println("明文二进制串的长度为:"+M_len);
 	//TODO:判断选择的算法
-	if (encrypt_frame.DES_rBtn.isSelected()) {
+	if (encrypt_frame.DES_rBtn.isSelected()||encrypt_frame.Mode==1) {
 	encrypt_algo.DES des = new encrypt_algo.DES();
+	//TODO:判断密钥长度的合规，抛出异常
+	if (encrypt_frame.DESKey_text.getText().length()!=8) {
+		System.out.println("输入的密钥不是8位！");
+	}
 	Keytext = StringToBinaryintArray(encrypt_frame.DESKey_text.getText());
 	if(encrypt_frame.Mode==0) 
 	Ctextbi=des.DESEncrypt(Mtextbi,Keytext);//得到密文的整形二进制序列
@@ -31,13 +39,19 @@ public File_Obj() throws IOException{
 		Ctextbi=des.DESDeEncrypt(Mtextbi,Keytext);//TODO: 当解密时要返回明文的长度，应该可以用Collections实现
 	String CString = new String(toStringMethod(Ctextbi));//将二进制序列转成String
 	Ctext = new int[CString.length()/8];
-	System.out.println(CString.length());
+	/**
+	 * 测试输出
+	 */
+	System.out.println("密文二进制串的长度为："+CString.length());
 	for (int i=0;i<CString.length()/8;i++) {//按8个一组将二进制序列转成byte值
 		Ctext[i] = Integer.parseInt(CString.substring(8*i,8*i+8),2);
 	}
 	}
-	else if (encrypt_frame.AES_rBtn.isSelected()) {
+	else if (encrypt_frame.AES_rBtn.isSelected()||encrypt_frame.Mode==1) {
 		encrypt_algo.AES aes = new encrypt_algo.AES();
+		if(encrypt_frame.AESKey_text.getText().length()!=16) {
+			System.out.println("输入的密钥不是16位！");
+		}
 		if(encrypt_frame.Mode==0) 
 			Ctext=aes.AESEncrypt(Mtobyte,encrypt_frame.AESKey_text.getText());//得到密文的整形二进制序列
 			else 
@@ -89,9 +103,6 @@ public static int[] byteArrayToBinaryintArray(byte[] in){
 }
 public static int[] StringToBinaryintArray(String s) {
 	int[] n = new int[8]; 
-	//TODO:判断密钥长度的合规，抛出异常
-	if(s.length()!=8)
-		System.out.println("输入的密钥不是8位！");
 	int[] m=new int[64];
 	 for(int i = 0;i<s.length();i++){
 	 n[i] = Integer.parseInt(s.substring(i,i+1));

@@ -105,7 +105,7 @@ public class DES {
 	private int[][] key_child = new int[16][48];
 	private int[] M = new int[64];
 	private int[] C = new int[64];
-	private boolean debug = false;//TODO:用处
+	private boolean debug = false;
 
 	
 	private void leftbit (int[] Array, int n) {
@@ -139,8 +139,8 @@ public class DES {
 		int[] C0 = new int[28];
 		int[] D0 = new int[28];
 		for (int i = 0; i < 28; i++) {
-			C0[i] = key[replace1_C[i] - 1];//-1是因为置换表是从1开始的
-			D0[i] = key[replace1_D[i] - 1];
+			C0[i] = KEY[replace1_C[i] - 1];//-1是因为置换表是从1开始的
+			D0[i] = KEY[replace1_D[i] - 1];
 		}
 		
 		for (int i = 0; i < 16; i++) {//16轮
@@ -344,6 +344,7 @@ public class DES {
 		c[64*(n-1)+k]=C[k];
 		return c;
 }
+	
 	public int[] DESDeEncrypt(int[] Ctext, int[] Keytext) {
 		// TODO 自动生成的方法存根
 		int n = Ctext.length/64;
@@ -371,6 +372,17 @@ public class DES {
 		for (int i=0;i<Ctext.length-Fi-8;i++)
 			m_end[i] = m[i];
 		return m_end;
+	}
+	
+	public boolean DESTest(int[] Mtext, int[] Keytext) {
+		setKey(Keytext);
+		M = Mtext.clone();
+		setM(M);
+		setC(C);
+		if (Arrays.equals(M, Mtext)==true)
+		return true;
+		else
+			return false;
 	}
 }
 

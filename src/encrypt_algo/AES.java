@@ -388,5 +388,22 @@ public class AES {
 			m[(n-1)*16+i]=result[i];
 		return m;
 	}
+	public boolean AESTest(byte[] Mtext, String Keytext) {
+		setKey(Keytext);
+		setM(Mtext);
+		encrypt();
+		for(int i = 0; i < 16; i++) {
+			C[i]=result[i];
+		}
+		decrypt();
+		int[] Mint = new int[16];
+		for (int i = 0; i < 16; i++) {
+			Mint[i]=(int)Mtext[i];
+		}
+		if (Arrays.equals(Mint, result)==true)
+		return true;
+		else
+			return false;
+	}
 }
 

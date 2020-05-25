@@ -43,6 +43,7 @@ public class encrypt_frame extends JFrame {
 	public static JRadioButton DES_rBtn;
 	public static JRadioButton AES_rBtn;
 	public static JRadioButton RSA_rBtn;
+	private JTextField textField;
 	/**
 	 * Launch the application.
 	 */
@@ -66,7 +67,7 @@ public class encrypt_frame extends JFrame {
 		setTitle("DES/AES/RSA\u52A0\u89E3\u5BC6");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 500, 694);
+		setBounds(100, 100, 500, 746);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -104,29 +105,34 @@ public class encrypt_frame extends JFrame {
 		Enc_Btn.setFont(new Font("宋体", Font.PLAIN, 15));
 		
 		JButton Exit_Btn = new JButton("\u9000\u51FA");
+		Exit_Btn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		Exit_Btn.setFont(new Font("宋体", Font.PLAIN, 15));
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
+			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
-					.addGap(2))
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 486, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGap(2)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE))
+					.addContainerGap())
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGap(82)
 					.addComponent(Enc_Btn, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
 					.addGap(70)
 					.addComponent(Exit_Btn, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(128, Short.MAX_VALUE))
-				.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
-					.addGap(2)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE))
+					.addContainerGap(142, Short.MAX_VALUE))
+				.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 486, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
+				.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
+					.addGap(2))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -138,21 +144,19 @@ public class encrypt_frame extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
 					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(18)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(Enc_Btn)
 						.addComponent(Exit_Btn))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap())
 		);
 		
 		JLabel label_1 = new JLabel("\u52A0\u5BC6\u65B9\u5F0F");
 		label_1.setBounds(10, 40, 48, 15);
 		label_1.setFont(new Font("宋体", Font.PLAIN, 12));
-		JButton FileBrowse_RSA = new JButton("\u6D4F\u89C8\u6587\u4EF6");
-		FileBrowse_RSA.setFont(new Font("宋体", Font.PLAIN, 12));
 		 DES_rBtn = new JRadioButton("DES\u52A0\u5BC6");
 		DESKey_text = new JTextField();
 		DES_rBtn.addActionListener(new ActionListener() {
@@ -162,7 +166,6 @@ public class encrypt_frame extends JFrame {
 				AESKey_text.setEnabled(false);
 				AESKeyConfirm.setEnabled(false);
 				InputFile_RSA.setEnabled(false);
-				FileBrowse_RSA.setEnabled(false);
 			}
 		});
 		DES_rBtn.setBounds(58, 38, 71, 25);
@@ -176,7 +179,6 @@ public class encrypt_frame extends JFrame {
 			AESKey_text.setEnabled(true);
 				AESKeyConfirm.setEnabled(true);
 			InputFile_RSA.setEnabled(false);
-				FileBrowse_RSA.setEnabled(false);
 			}
 		});
 		AES_rBtn.setBounds(130, 38, 71, 25);
@@ -190,7 +192,6 @@ public class encrypt_frame extends JFrame {
 			AESKey_text.setEnabled(false);
 				AESKeyConfirm.setEnabled(false);
 			InputFile_RSA.setEnabled(true);
-				FileBrowse_RSA.setEnabled(true);
 			}
 		});
 		RSA_rBtn.setBounds(201, 38, 71, 25);
@@ -280,8 +281,14 @@ public class encrypt_frame extends JFrame {
 		InputFile_RSA = new JTextField();
 		InputFile_RSA.setColumns(10);
 		
-		JLabel lblNewLabel_2 = new JLabel("\u8F93\u5165\u6587\u4EF6");
+		JLabel lblNewLabel_2 = new JLabel("\u516C\u94A5");
 		lblNewLabel_2.setFont(new Font("宋体", Font.PLAIN, 12));
+		
+		JLabel lblNewLabel_2_1 = new JLabel("\u79C1\u94A5");
+		lblNewLabel_2_1.setFont(new Font("宋体", Font.PLAIN, 12));
+		
+		textField = new JTextField();
+		textField.setColumns(10);
 		
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
@@ -289,25 +296,31 @@ public class encrypt_frame extends JFrame {
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-					.addGap(6)
-					.addComponent(InputFile_RSA, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-					.addGap(8)
-					.addComponent(FileBrowse_RSA, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(29, Short.MAX_VALUE))
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_2.createSequentialGroup()
+							.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+							.addGap(6)
+							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_2.createSequentialGroup()
+							.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(InputFile_RSA, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(118, Short.MAX_VALUE))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
+					.addGap(10)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
+						.addComponent(InputFile_RSA, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_2.createSequentialGroup()
 							.addGap(5)
-							.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE))
-						.addComponent(InputFile_RSA, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addGap(1)
-							.addComponent(FileBrowse_RSA, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(43, Short.MAX_VALUE))
+							.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE))
+						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_2.setLayout(gl_panel_2);
 		
