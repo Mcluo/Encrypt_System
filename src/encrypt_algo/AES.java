@@ -1,6 +1,7 @@
 package encrypt_algo;
 
 import java.util.Arrays;
+import java.util.zip.DataFormatException;
 public class AES {
 	private static final int[] Sbox = new int[] {
 	 /* 0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F  */
@@ -323,19 +324,15 @@ public class AES {
 	public int[] AESEncrypt(byte[] mtext, String keytext) {
 		// TODO 自动生成的方法存根
 		int n = mtext.length/16;
-//		int[] c = new int[(n+1)*128];
 			n=n+1;
 			int[] c = new int[n*16];
 			setKey(keytext);
 		for (int i=0;i<n-1;i++) {
-//			M=Arrays.copyOfRange(Mtext,i*64,(i+1)*64);
 			byte[] m = Arrays.copyOfRange(mtext, i*16, (i+1)*16);
 			setM(m);
 			encrypt();
 			for (int j=0;j<16;j++)
 			c[i*16+j] = result[j];
-//		for (int j=0;j<64;j++) {
-//			c[j+i*64]=C[j];
 		}
 		byte[] m = new byte[16];
 		for (int i=0;i<mtext.length%16;i++) //最后一组明文的补位
@@ -347,30 +344,16 @@ public class AES {
 		encrypt();
 		for (int j=0;j<16;j++)
 		c[(n-1)*16+j] = result[j];
-//			M[i]=Mtext[64*(n-1)+i];
-//			for (int j=0;j<56-Mtext.length%64;j++) {//明文位到56位是01填充位，最后一个字节是表示填充长度。
-//			if (j%2==0)
-//				M[Mtext.length%64+j]=0;
-//			else
-//				M[Mtext.length%64+j]=1;
-//		}
-//		String len= new String(Integer.toBinaryString(Mtext.length%64));//把填充长度表示成二进制
-//		for (int k=8-len.length();k<8;k++) {
-//			M[56+k]=Integer.parseInt(len.substring(k-8+len.length(),k-7+len.length()));
-//		}
-//		for (int k=0;k<8-len.length();k++) {
-//			M[56+k]=0;
-//		}
-//		setM(M);
-//		for(int k=0;k<64;k++)
-//		c[64*(n-1)+k]=C[k];
-//		return c;
 		return c;
 	}
-	public int[] AESDeEncrypt(byte[] ctext, String keytext) {
+	public int[] AESDeEncrypt(byte[] ctext, String keytext) throws DataFormatException{
 		// TODO 自动生成的方法存根
 		int n = ctext.length/16;
-		int[] m = new int[(n-1)*16+ctext.length%16];
+		if (ctext.length%16!=0) {
+			DataFormatException e = new DataFormatException();
+		throw e;
+		}
+		int[] m = new int[n*16];
 		setKey(keytext);
 		for (int i=0;i<n-1;i++) {
 			byte[] c = Arrays.copyOfRange(ctext, i*16, (i+1)*16);
@@ -384,9 +367,13 @@ public class AES {
 		c[i] = ctext[(n-1)*16+i];
 		setC(c);
 		decrypt();		
-		for (int i=0;i<ctext.length%16;i++) //最后一组明文的补位
+		int last_length = 16-result[15]/8;
+		int[] m_true = new int[last_length+(n-1)*16];
+		for (int i=0;i<last_length;i++) //最后一组明文的补位
 			m[(n-1)*16+i]=result[i];
-		return m;
+		for (int i=0;i<last_length+(n-1)*16;i++)
+			m_true[i] = m[i];
+		return m_true;
 	}
 	public boolean AESTest(byte[] Mtext, String Keytext) {
 		setKey(Keytext);
@@ -401,7 +388,7 @@ public class AES {
 			Mint[i]=(int)Mtext[i];
 		}
 		if (Arrays.equals(Mint, result)==true)
-		return true;
+			return true;
 		else
 			return false;
 	}

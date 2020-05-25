@@ -1,8 +1,6 @@
 package encrypt_algo;
 
 import fileIO.*;
-import ui.encrypt_frame;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Disabled;
@@ -29,7 +27,7 @@ import java.io.*;
 	 	@Disabled
 		@Test 
 		/**
-		 * 功能测试正常
+		 * DESEncrypt功能测试正常
 		 * @throws IOException
 		 */
 		public void testDESEncrypt() throws IOException {
@@ -43,7 +41,7 @@ import java.io.*;
 	 	@Disabled
 		@Test
 		/**
-		 * 功能测试异常
+		 * DES算法功能测试异常
 		 */
 		public void testDESTest() {
 			DES des = new DES();
@@ -57,7 +55,7 @@ import java.io.*;
 		}
 		@Test
 		/**
-		 * 功能测试正常
+		 * AES算法功能测试正常
 		 */
 		public void testAESTest() {
 			AES aes = new AES();
@@ -66,5 +64,17 @@ import java.io.*;
 				System.out.println("功能正常");
 			else
 				System.out.println("功能异常");
+		}
+//		@Test
+		/**
+		 * 测试AESEncrypt函数
+		 */
+		public void testAESEncrypt() throws IOException{
+		{
+			File_Obj.Mtobyte = new ReadFile().getContent("C:\\Users\\18465\\Desktop\\问题3.txt");
+			AES aes = new AES();
+			File_Obj.Ctext = aes.AESEncrypt(File_Obj.Mtobyte,"1234567890abcdef");
+			
+		}
 		}
 }

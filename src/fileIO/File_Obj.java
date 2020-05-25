@@ -25,6 +25,8 @@ public File_Obj() throws IOException{
 	 * 测试输出
 	 */
 	System.out.println("明文二进制串的长度为:"+M_len);
+	
+	
 	//TODO:判断选择的算法
 	if (encrypt_frame.DES_rBtn.isSelected()||encrypt_frame.Mode==1) {
 	encrypt_algo.DES des = new encrypt_algo.DES();
@@ -47,28 +49,27 @@ public File_Obj() throws IOException{
 		Ctext[i] = Integer.parseInt(CString.substring(8*i,8*i+8),2);
 	}
 	}
+	
+	
 	else if (encrypt_frame.AES_rBtn.isSelected()||encrypt_frame.Mode==1) {
 		encrypt_algo.AES aes = new encrypt_algo.AES();
 		if(encrypt_frame.AESKey_text.getText().length()!=16) {
 			System.out.println("输入的密钥不是16位！");
 		}
-		if(encrypt_frame.Mode==0) 
+		if(encrypt_frame.Mode==0) {
 			Ctext=aes.AESEncrypt(Mtobyte,encrypt_frame.AESKey_text.getText());//得到密文的整形二进制序列
+		}
 			else 
+				try {
 				Ctext=aes.AESDeEncrypt(Mtobyte,encrypt_frame.AESKey_text.getText());//TODO: 当解密时要返回明文的长度，应该可以用Collections实现
+				System.out.print(Ctext);
+				}catch(Exception e) {
+					System.out.println("--Exception--");
+				}
 			}
-	
-//	}
-	
-//	String CString = new String(toStringMethod(Ctextbi));//将二进制序列转成String
-//	Ctext = new int[M_len/8]; 
-//	System.out.println(CString.length());
-//	System.out.println(M_len);
-//	for (int i=0;i<M_len/8;i++) {//按8个一组将二进制序列转成byte值
-//		Ctext[i] = Integer.parseInt(CString.substring(8*i,8*i+8),2);
-//	}
-//	}
 	Ctobyte = intArrayTobyteArray(Ctext);
+	for (int i=0;i<Ctobyte.length;i++)
+	System.out.print(String.valueOf(Ctobyte[i])+",");
 	WriteFile f2 = new WriteFile();
 	f2.createFile(encrypt_frame.OutputFile.getText(), Ctobyte);
 	
