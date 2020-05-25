@@ -235,50 +235,11 @@ public class AES {
 		for (int i = 0; i < 16; i++)
 		M[i]=(int)str[i];
 	}
-//		char[] s = str.toCharArray();//将字符串转换成字符数组，可以访问每一个字符
-//		int tmp;
-//		for (int i = 0; i < 16; i++) {//看不懂，为什么是32个char为一个状态矩阵
-//			tmp = 0;
-//			for (int j = 0; j < 2; j++) {
-//				if (j == 1) {
-//					tmp *= 16;
-//				}
-//				if (s[2 * i + j] <= '9') {
-//					tmp += s[2 * i + j] - '0';
-//				} else if (s[2 * i + j] <= 'F'){
-//					tmp += s[2 * i + j] - 'A' + 10;
-//				} else {
-//					tmp += s[2 * i + j] - 'a' + 10;
-//				} 
-//			}
-//			M[i] = tmp;
-//		}
-		
-//	}
 	public void setC (byte[] str) {//设置密文
 		for (int i = 0; i < 16; i++) {
 			C[i]=(int)str[i];
 		}
 	}
-//		char[] s = str.toCharArray();
-//		int tmp;
-//		for (int i = 0; i < 16; i++) {
-//			tmp = 0;
-//			for (int j = 0; j < 2; j++) {
-//				if (j == 1) {
-//					tmp *= 16;
-//				}
-//				if (s[2 * i + j] <= '9') {
-//					tmp += s[2 * i + j] - '0';
-//				} else if (s[2 * i + j] <= 'F'){
-//					tmp += s[2 * i + j] - 'A' + 10;
-//				} else {
-//					tmp += s[2 * i + j] - 'a' + 10;
-//				} 
-//			}
-//			C[i] = tmp;
-//		}
-//	}
 	public void setKey (String str) {
 		char[] s = str.toCharArray();
 		int tmp;
