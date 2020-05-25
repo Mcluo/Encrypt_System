@@ -10,10 +10,6 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
  class DESEncrypt_test {
 	 int[] Padding(){
-//		 if (Mtext.length!=64) {
-//			 DataFormatException e = new DataFormatException();
-//		 throw e;
-//		 }
 		 int[] M = new int[64];
 		 for (int j=0;j<56;j++) {//明文位到56位是01填充位，最后一个字节是表示填充长度。
 				if (j%2==0)
