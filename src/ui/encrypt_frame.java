@@ -11,8 +11,11 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 
 import fileIO.File_Obj;
+import fileIO.ReadFile;
+import fileIO.WriteFile;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
@@ -26,10 +29,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.awt.event.WindowAdapter;
 
 public class encrypt_frame extends JFrame {
 
@@ -58,6 +64,16 @@ public class encrypt_frame extends JFrame {
 				try {
 					encrypt_frame frame = new encrypt_frame();
 					frame.setVisible(true);
+					Object[] option = {"加密","解密"};
+					int Option = JOptionPane.showOptionDialog(frame,"初始化选择：请选择你想进行的操作","提示",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE,null,option,option[0]);
+					if(Option == 0)
+						JOptionPane.showMessageDialog(null, "请先在主面板的选项中选择加密算法");
+					if(Option ==1) {
+						encrypt_frame.AES_rBtn.setEnabled(false);
+						encrypt_frame.DES_rBtn.setEnabled(false);
+						encrypt_frame.RSA_rBtn.setEnabled(false);
+						encrypt_frame.Enc_Btn.setText("解密");
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -69,6 +85,15 @@ public class encrypt_frame extends JFrame {
 	 * Create the frame.
 	 */
 	public encrypt_frame() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				 int i=JOptionPane.showConfirmDialog(null, "确定要退出系统吗？", "退出系统", JOptionPane.YES_NO_OPTION);
+				 if(i==JOptionPane.YES_OPTION){
+				 System.exit(0);
+			}}
+		});
+		
 		setSize(new Dimension(500, 763));
 		setTitle("DES/AES/RSA\u52A0\u89E3\u5BC6");
 		setResizable(false);
@@ -114,7 +139,9 @@ public class encrypt_frame extends JFrame {
 		JButton Exit_Btn = new JButton("\u9000\u51FA");
 		Exit_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				int confirm = JOptionPane.showConfirmDialog(Exit_Btn,"提示", "确认退出吗？",JOptionPane.YES_NO_OPTION);
+				if(confirm == JOptionPane.OK_OPTION)
+					dispose();
 			}
 		});
 		Exit_Btn.setFont(new Font("宋体", Font.PLAIN, 15));
@@ -179,7 +206,45 @@ public class encrypt_frame extends JFrame {
 		label_1.setFont(new Font("宋体", Font.PLAIN, 12));
 		 DES_rBtn = new JRadioButton("DES\u52A0\u5BC6");
 		 JButton importkey_btn = new JButton("\u5BFC\u5165");
+		 importkey_btn.addActionListener(new ActionListener() {
+		 	public void actionPerformed(ActionEvent e) {
+		 		JFileChooser read = new JFileChooser(File_Obj.getProjectpath()+"\\key");			
+				int returnVal = read.showOpenDialog(null);
+				if (returnVal==read.APPROVE_OPTION) {
+					ReadFile input = new ReadFile();
+					try {
+						byte[] keybyte = input.getContent(read.getSelectedFile().toString());
+						BigInteger Key = new BigInteger(keybyte);
+						RSAkey_text.setText(Key.toString(16));
+						if (encrypt_frame.RSA_rBtn.isSelected()&&encrypt_frame.RSA_rBtn.isEnabled()) {
+							encrypt_frame.RSAkey_Lab.setText("公钥("+Key.toString(16).length()+")");
+						}
+						else if(!encrypt_frame.RSA_rBtn.isEnabled())
+							encrypt_frame.RSAkey_Lab.setText("私钥("+Key.toString(16).length()+")");
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+		 	}
+		 });
 			JButton importn_btn = new JButton("\u5BFC\u5165");
+			importn_btn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JFileChooser read = new JFileChooser(File_Obj.getProjectpath()+"\\key");			
+					int returnVal = read.showOpenDialog(null);
+					if (returnVal==read.APPROVE_OPTION) {
+						ReadFile input = new ReadFile();
+						try {
+							byte[] nbyte = input.getContent(read.getSelectedFile().toString());
+							BigInteger N = new BigInteger(nbyte);
+							n_text.setText(N.toString(16));
+							encrypt_frame.n_Lab.setText("模数n("+N.toString(16).length()+")");
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+			});
 		DESKey_text = new JTextField();
 		DES_rBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -429,10 +494,10 @@ public class encrypt_frame extends JFrame {
 		InputFile.setColumns(10);
 		
 		JButton FileBrowse = new JButton("\u6D4F\u89C8\u6587\u4EF6");
-		FileBrowse.setBounds(383, 34, 81, 23);
+		FileBrowse.setBounds(383, 34, 87, 23);
 		FileBrowse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fc1 = new JFileChooser("d:\\");			
+				JFileChooser fc1 = new JFileChooser(File_Obj.getProjectpath());			
 				int returnVal = fc1.showOpenDialog(null);
 				if (returnVal==fc1.APPROVE_OPTION) {
 					//正常选择文件
@@ -441,6 +506,7 @@ public class encrypt_frame extends JFrame {
 					String prefix = oldPath.substring(oldPath.lastIndexOf("."));
 					String newPath = new String();
 					if (prefix.equals(".des")||(prefix.equals(".aes"))||(prefix.equals(".rsa"))) {
+						Enc_Btn.setText("解密");
 						if(prefix.equals(".des")) {
 						Mode = 1;//判断是DES解密
 						AESKey_text.setEnabled(false);
@@ -478,8 +544,19 @@ public class encrypt_frame extends JFrame {
 					newPath = OldPath.append(".des").toString();
 						else if(AES_rBtn.isSelected())
 							newPath = OldPath.append(".aes").toString();
-						else if(RSA_rBtn.isSelected())
+						else if(RSA_rBtn.isSelected()) {
 							newPath = OldPath.append(".rsa").toString();
+							ReadFile f1 = new ReadFile();
+							try {
+							byte[] M = f1.getContent(fc1.getSelectedFile().toString());
+							BigInteger MB = new BigInteger(M);
+							String MBS = MB.toString(16);
+							int len = MBS.length();
+							JOptionPane.showMessageDialog(FileBrowse, "RSA算法的模数n的位数必须大于"+len);
+							}catch (IOException e1) {
+								e1.printStackTrace();
+							}
+						}
 					}
 					OutputFile.setText(newPath);
 				}
@@ -502,7 +579,7 @@ public class encrypt_frame extends JFrame {
 		JButton DirectorySelect_output = new JButton("\u9009\u62E9\u76EE\u5F55");
 		DirectorySelect_output.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fc1 = new JFileChooser("d:\\");			
+				JFileChooser fc1 = new JFileChooser(File_Obj.getProjectpath());			
 				int returnVal = fc1.showOpenDialog(null);
 				if (returnVal==fc1.APPROVE_OPTION) {
 					//正常选择文件
@@ -514,7 +591,7 @@ public class encrypt_frame extends JFrame {
 			}
 			}
 		});
-		DirectorySelect_output.setBounds(382, 65, 82, 23);
+		DirectorySelect_output.setBounds(382, 65, 88, 23);
 		DirectorySelect_output.setFont(new Font("宋体", Font.PLAIN, 12));
 		
 		JCheckBox TolerantPath_Box = new JCheckBox("\u8F93\u51FA\u6587\u4EF6\u7684\u9ED8\u8BA4\u8DEF\u5F84");

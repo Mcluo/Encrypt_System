@@ -7,6 +7,7 @@ import javax.swing.border.TitledBorder;
 
 import encrypt_algo.RSA;
 import fileIO.File_Obj;
+import fileIO.WriteFile;
 
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.event.ActionListener;
@@ -18,6 +19,9 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class keyproduction_frame extends JDialog{
 	private JTextField p_text;
@@ -29,7 +33,17 @@ public class keyproduction_frame extends JDialog{
 	private JTextField d_text;
 	private int key_length;
 	private JTextField n_text;
+	private int eisoutput,disoutput,nisoutput =0;
 	public keyproduction_frame() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				 int i=JOptionPane.showConfirmDialog(null, "确定要退出吗？", "退出界面", JOptionPane.YES_NO_OPTION);
+				 if(i==JOptionPane.YES_OPTION){
+				 System.exit(0);
+				 }
+			}
+		});
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setSize(new Dimension(570, 558));
@@ -98,10 +112,18 @@ public class keyproduction_frame extends JDialog{
 		JButton finish_Btn = new JButton("\u5B8C\u6210");
 		finish_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(nisoutput==0) 
+					JOptionPane.showMessageDialog(finish_Btn, "模数还未保存，请先保存！");
+					else if(eisoutput==0) 
+						JOptionPane.showMessageDialog(finish_Btn, "公钥还未保存，请先保存！");
+						else if(disoutput==0)
+							JOptionPane.showMessageDialog(finish_Btn, "私钥还未保存，请先保存！");
+				else {
 				int confirm = JOptionPane.showConfirmDialog(finish_Btn, "提示", "确认密钥生成完成?", JOptionPane.YES_NO_OPTION); 
 				if(confirm == JOptionPane.OK_OPTION)
 					dispose();
 			}
+				}
 		});
 		
 		JPanel panel_1_1 = new JPanel();
@@ -167,9 +189,16 @@ public class keyproduction_frame extends JDialog{
 		JButton outputn_Btn = new JButton("\u5BFC\u51FA");
 		outputn_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser estorage = new JFileChooser("d:\\");			
+				nisoutput = 1;
+				JFileChooser estorage = new JFileChooser(File_Obj.getProjectpath()+"\\key");			
 				int returnVal = estorage.showOpenDialog(null);
 				if (returnVal==estorage.APPROVE_OPTION) {
+					WriteFile outputn = new WriteFile();
+					try {
+						outputn.createFile(estorage.getSelectedFile().toString(), rsa.getn().toByteArray());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				}
 				}
 		});
@@ -280,8 +309,38 @@ public class keyproduction_frame extends JDialog{
 		d_text.setColumns(10);
 		
 		JButton outpute_Btn_1 = new JButton("\u5BFC\u51FA");
+		outpute_Btn_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				eisoutput = 1;
+				JFileChooser estorage = new JFileChooser(File_Obj.getProjectpath()+"\\key");			
+				int returnVal = estorage.showOpenDialog(null);
+				if (returnVal==estorage.APPROVE_OPTION) {
+					WriteFile outputn = new WriteFile();
+					try {
+						outputn.createFile(estorage.getSelectedFile().toString(), rsa.gete().toByteArray());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
 		
 		JButton outputd_Btn_1 = new JButton("\u5BFC\u51FA");
+		outputd_Btn_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				disoutput = 1;
+				JFileChooser estorage = new JFileChooser(File_Obj.getProjectpath()+"\\key");			
+				int returnVal = estorage.showOpenDialog(null);
+				if (returnVal==estorage.APPROVE_OPTION) {
+					WriteFile outputn = new WriteFile();
+					try {
+						outputn.createFile(estorage.getSelectedFile().toString(), rsa.getd().toByteArray());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)

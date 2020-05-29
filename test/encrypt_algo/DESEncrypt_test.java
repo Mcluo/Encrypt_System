@@ -1,6 +1,8 @@
 package encrypt_algo;
 
 import fileIO.*;
+import ui.encrypt_frame;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Disabled;
@@ -8,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.Random;
+
+import javax.swing.JOptionPane;
  class DESEncrypt_test {
 	 int[] Padding(){
 		 int[] M = new int[64];
@@ -81,14 +85,42 @@ import java.util.Random;
 			
 		}
 		}
-		
+		@Disabled
 		@Test
 		public void testRSA() {
 			BigInteger c = BigInteger.probablePrime(40,new Random());
 			BigInteger d = new BigInteger(c.toByteArray());
+			byte[] cd = c.toByteArray();
 			if(c.equals(d))
 				System.out.println("功能正常");
 			else
 				System.out.println("功能异常");
+		}
+		@Disabled
+		@Test
+		public void testURI() {
+			String path = System.getProperty("user.dir");
+			System.out.print(path+"\\key");
+		}
+//		@Disabled
+		@Test
+		public void testgetFileSize() throws IOException{
+			File file = new File("D:\\软件\\Eclipseworkspace_32\\Encrypt_system\\test\\测试文件4.txt");
+			long size = file.length();
+			System.out.println("java.txt文件大小为: " + size +"bytes");
+			ReadFile f1 = new ReadFile();
+			byte[] M = f1.getContent("D:\\软件\\Eclipseworkspace_32\\Encrypt_system\\test\\测试文件4.txt");
+			BigInteger MB = new BigInteger(M);
+			String MBS = MB.toString(16);
+			int len = MBS.length();
+			System.out.println("模数n的位数必须大于"+len);
+			RSA rsa = new RSA();
+			rsa.findp(100);
+			rsa.findq(100);
+			rsa.keypro();
+			BigInteger n = rsa.getn();
+			if(new BigInteger(M).compareTo(n)>0)
+				JOptionPane.showMessageDialog(encrypt_frame.Enc_Btn,"文件大小超出加密范围！");
+			
 		}
 }

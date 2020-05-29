@@ -89,34 +89,40 @@ public void CryptBtn() throws IOException{
 		encrypt_algo.RSA rsa = new encrypt_algo.RSA();
 		if(encrypt_frame.RSAkey_text.getText().equals(""))
 			JOptionPane.showMessageDialog(encrypt_frame.Enc_Btn,"请生成或导入密钥对后再进行加解密操作！");
+		if(encrypt_frame.RSAkey_Lab.getText().contains("公")&&!encrypt_frame.RSA_rBtn.isEnabled())
+			JOptionPane.showMessageDialog(null, "请用私钥解密！");
+		if(encrypt_frame.RSAkey_Lab.getText().contains("私")&&encrypt_frame.RSA_rBtn.isEnabled())
+			JOptionPane.showMessageDialog(null, "请用公钥加密！");
 		else {
-//			PublicKey = encrypt_frame.Publickey_text.getText().getBytes();
-//			BigInteger e = new BigInteger(PublicKey);
-//			PrivateKey = encrypt_frame.Privatekey_text.getText().getBytes();
-//			BigInteger d = new BigInteger(PrivateKey);
-//			rsa.sete_d(e, d);
-			if(M_len>n.toByteArray().length)
+			n = new BigInteger(encrypt_frame.n_text.getText(),16);
+			if(new BigInteger(Mtobyte).compareTo(n)>0)
 				JOptionPane.showMessageDialog(encrypt_frame.Enc_Btn,"文件大小超出加密范围！");
-			rsa.sete_d_n(e,d,n);
+			else {
+				if(encrypt_frame.RSA_rBtn.isSelected()&&encrypt_frame.RSA_rBtn.isEnabled()) {
+					e = new BigInteger(encrypt_frame.RSAkey_text.getText(),16);
+			rsa.sete(e);}
+				else {
+					d = new BigInteger(encrypt_frame.RSAkey_text.getText(),16);
+					rsa.setd(d);}
+				rsa.setn(n);
 			BigInteger C;
 			if(encrypt_frame.Mode==0) 			
 				 C = rsa.encode(new BigInteger(Mtobyte));
 		else 
 			 C = rsa.decode(new BigInteger(Mtobyte));
 			Ctobyte = C.toByteArray();
+			/**
+			 * 输出函数输出字节数组
+			 */
+			for (int i=0;i<Ctobyte.length;i++)
+				System.out.print(String.valueOf(Ctobyte[i])+",");
+				System.out.println("");
+				WriteFile f2 = new WriteFile();
+				f2.createFile(encrypt_frame.OutputFile.getText(), Ctobyte);
+		}
 		}
 	}
-	
-	/**
-	 * 输出函数输出字节数组
-	 */
-	for (int i=0;i<Ctobyte.length;i++)
-	System.out.print(String.valueOf(Ctobyte[i])+",");
-	System.out.println("");
-	WriteFile f2 = new WriteFile();
-	f2.createFile(encrypt_frame.OutputFile.getText(), Ctobyte);
 	}
-	
 }
 public static int[] byteArrayTointArray(byte[] b) {
 	int[] in1 = new int[b.length];
@@ -169,5 +175,10 @@ private static String toStringMethod(int[] arr)
 		sb.append(arr[i]);
 	}
 	return sb.toString();
+}
+
+public static String getProjectpath() {
+	String path = System.getProperty("user.dir");
+	return path;
 }
 }

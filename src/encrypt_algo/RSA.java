@@ -20,9 +20,13 @@ public class RSA {
             BigInteger y = egcd(totient, e)[1];
             d = y.mod(totient); //产生私钥
         }
-        public void sete_d_n(BigInteger e,BigInteger d,BigInteger n) {
+        public void sete(BigInteger e) {
         	this.e = e;
+        }
+        public void setd(BigInteger d) {
         	this.d = d;
+        }
+        public void setn(BigInteger n) {
         	this.n = n;
         }
         public void setp_q(BigInteger p,BigInteger q) {
@@ -84,11 +88,11 @@ public class RSA {
     }
     // 加密
     public BigInteger encode(BigInteger d) {
-        return d.modPow(this.e, this.n);
+        return d.modPow(e, n);
     }//这里的d是明文
     // 解密
     public BigInteger decode(BigInteger c) {
-        return c.modPow(this.d, this.n);
+        return c.modPow(d, n);
     }
     public void findp(int bitLength){//此处bitLength并不是二进制位长，而是十六进制数的位长
             this.p=BigInteger.probablePrime(bitLength*4,new Random());
