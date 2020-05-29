@@ -3,9 +3,12 @@ package fileIO;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.swing.JOptionPane;
+
 public class WriteFile {
 	//将byte数组写入文件
     public void createFile(String path, byte[] content) throws IOException {
+    	if(path.equals(""))JOptionPane.showMessageDialog(null, "请键入输出文件路径!");
         FileOutputStream fos = new FileOutputStream(path);
         fos.write(content);
         fos.close();

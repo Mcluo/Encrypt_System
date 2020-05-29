@@ -233,11 +233,11 @@ public class AES {
 	
 	public void setM (byte[] str) { //设置明文 把输入流中的明文转换成对应的ASCII码数组
 		for (int i = 0; i < 16; i++)
-		M[i]=(int)str[i];
+		M[i]=0xFF &(int)str[i];
 	}
 	public void setC (byte[] str) {//设置密文
 		for (int i = 0; i < 16; i++) {
-			C[i]=(int)str[i];
+			C[i]=0xFF &(int)str[i];
 		}
 	}
 	public void setKey (String str) {
@@ -346,7 +346,7 @@ public class AES {
 		decrypt();
 		int[] Mint = new int[16];
 		for (int i = 0; i < 16; i++) {
-			Mint[i]=(int)Mtext[i];
+			Mint[i]=0xFF &(int)Mtext[i];
 		}
 		if (Arrays.equals(Mint, result)==true)
 			return true;

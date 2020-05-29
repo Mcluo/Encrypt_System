@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import java.io.*;
+import java.math.BigInteger;
+import java.util.Random;
  class DESEncrypt_test {
 	 int[] Padding(){
 		 int[] M = new int[64];
@@ -53,19 +55,21 @@ import java.io.*;
 			else
 				System.out.println("功能异常");
 		}
+	 	@Disabled
 		@Test
 		/**
 		 * AES算法功能测试正常
 		 */
 		public void testAESTest() {
 			AES aes = new AES();
-			byte[] Mtext = new byte[] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+			byte[] Mtext = new byte[] {-1,-22,3,4,5,6,65,54,9,13,108,12,13,14,115,16};
 			if(aes.AESTest(Mtext,"1234567890abcdef"))
 				System.out.println("功能正常");
 			else
 				System.out.println("功能异常");
 		}
-//		@Test
+		@Disabled
+		@Test
 		/**
 		 * 测试AESEncrypt函数
 		 */
@@ -76,5 +80,15 @@ import java.io.*;
 			File_Obj.Ctext = aes.AESEncrypt(File_Obj.Mtobyte,"1234567890abcdef");
 			
 		}
+		}
+		
+		@Test
+		public void testRSA() {
+			BigInteger c = BigInteger.probablePrime(40,new Random());
+			BigInteger d = new BigInteger(c.toByteArray());
+			if(c.equals(d))
+				System.out.println("功能正常");
+			else
+				System.out.println("功能异常");
 		}
 }

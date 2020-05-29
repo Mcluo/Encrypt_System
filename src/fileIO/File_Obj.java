@@ -1,6 +1,9 @@
 package fileIO;
 
 import java.io.IOException;
+import java.math.BigInteger;
+
+import javax.swing.JOptionPane;
 
 import ui.encrypt_frame;
 
@@ -8,19 +11,32 @@ public class File_Obj {
 public static byte[] Mtobyte;
 public byte[] Ctobyte;
 public byte[] Keytobyte;
+public byte[] PublicKey;
+public byte[] PrivateKey;
 public static int[] Mtext;
 public static int[] Ctext;
 public static int[] Keytext;
 public static int[] Mtextbi;
 public static int[] Ctextbi;
 public static int M_len;
+public static BigInteger e,d,n;
 
-public File_Obj() throws IOException{
+public File_Obj(){
+}
+public void CryptBtn() throws IOException{
 	ReadFile f1 = new ReadFile();
-	
+	if(encrypt_frame.InputFile.getText().equals(""))
+		JOptionPane.showMessageDialog(null, "未键入输入文件路径！");
+	else {
 	Mtobyte = f1.getContent(encrypt_frame.InputFile.getText());//获得文件的字节流//read()读出来的是有符号的整形
 	Mtextbi=byteArrayToBinaryintArray(Mtobyte);//将字节流转换成二进制流（8的倍数）
 	M_len = Mtextbi.length;//明文二进制串的长度
+	/**
+	 * 输出函数输入字节数组
+	 */
+	for(int i=0;i<Mtobyte.length;i++)
+		System.out.print(String.valueOf(Mtobyte[i])+",");
+	System.out.println("");
 	/**
 	 * 测试输出
 	 */
@@ -45,34 +61,61 @@ public File_Obj() throws IOException{
 	 * 测试输出
 	 */
 	System.out.println("密文二进制串的长度为："+CString.length());
-	for (int i=0;i<CString.length()/8;i++) {//按8个一组将二进制序列转成byte值
+	for (int i=0;i<CString.length()/8;i++) {//按8个一组将二进制序列转成int值
 		Ctext[i] = Integer.parseInt(CString.substring(8*i,8*i+8),2);
 	}
+	Ctobyte = intArrayTobyteArray(Ctext);
 	}
 	
 	
-	else if (encrypt_frame.AES_rBtn.isSelected()||encrypt_frame.Mode==1) {
+	else if (encrypt_frame.AES_rBtn.isSelected()||encrypt_frame.Mode==2) {
 		encrypt_algo.AES aes = new encrypt_algo.AES();
 		if(encrypt_frame.AESKey_text.getText().length()!=16) {
 			System.out.println("输入的密钥不是16位！");
 		}
 		if(encrypt_frame.Mode==0) {
-			Ctext=aes.AESEncrypt(Mtobyte,encrypt_frame.AESKey_text.getText());//得到密文的整形二进制序列
+			Ctext=aes.AESEncrypt(Mtobyte,encrypt_frame.AESKey_text.getText());//得到密文的整形序列
 		}
 			else 
 				try {
 				Ctext=aes.AESDeEncrypt(Mtobyte,encrypt_frame.AESKey_text.getText());//TODO: 当解密时要返回明文的长度，应该可以用Collections实现
-				System.out.print(Ctext);
 				}catch(Exception e) {
 					System.out.println("--Exception--");
 				}
+		Ctobyte = intArrayTobyteArray(Ctext);
 			}
-	Ctobyte = intArrayTobyteArray(Ctext);
+	
+	else if(encrypt_frame.RSA_rBtn.isSelected()||encrypt_frame.Mode==3) {
+		encrypt_algo.RSA rsa = new encrypt_algo.RSA();
+		if(encrypt_frame.RSAkey_text.getText().equals(""))
+			JOptionPane.showMessageDialog(encrypt_frame.Enc_Btn,"请生成或导入密钥对后再进行加解密操作！");
+		else {
+//			PublicKey = encrypt_frame.Publickey_text.getText().getBytes();
+//			BigInteger e = new BigInteger(PublicKey);
+//			PrivateKey = encrypt_frame.Privatekey_text.getText().getBytes();
+//			BigInteger d = new BigInteger(PrivateKey);
+//			rsa.sete_d(e, d);
+			if(M_len>n.toByteArray().length)
+				JOptionPane.showMessageDialog(encrypt_frame.Enc_Btn,"文件大小超出加密范围！");
+			rsa.sete_d_n(e,d,n);
+			BigInteger C;
+			if(encrypt_frame.Mode==0) 			
+				 C = rsa.encode(new BigInteger(Mtobyte));
+		else 
+			 C = rsa.decode(new BigInteger(Mtobyte));
+			Ctobyte = C.toByteArray();
+		}
+	}
+	
+	/**
+	 * 输出函数输出字节数组
+	 */
 	for (int i=0;i<Ctobyte.length;i++)
 	System.out.print(String.valueOf(Ctobyte[i])+",");
+	System.out.println("");
 	WriteFile f2 = new WriteFile();
 	f2.createFile(encrypt_frame.OutputFile.getText(), Ctobyte);
-	
+	}
 	
 }
 public static int[] byteArrayTointArray(byte[] b) {

@@ -4,27 +4,58 @@ import java.math.BigInteger;
 import java.util.Random;
 
 public class RSA {
-        private BigInteger p = null;
-        private BigInteger q = null;
+        private  BigInteger p = null;
+        private  BigInteger q = null;
         private BigInteger n = null;
         private BigInteger totient = null;
         private BigInteger e = null;
         private BigInteger d = null;
-        public RSA(BigInteger p, BigInteger q) {
-            this.p = p;
-            this.q = q;
+        public RSA() {
+        }
+        public void keypro() {
             n = p.multiply(q); // n = p * q;//totient =(p-1)*(q-1)即 (n)
             totient = (p.subtract(BigInteger.valueOf(1)).multiply(q
                     .subtract(BigInteger.valueOf(1))));//BigInteger.substract().multiply()这种形式是允许的
-            e = getE();//选择公钥
+            e = totient.divide(BigInteger.valueOf(4)).nextProbablePrime();////nextProbablePrime()返回比this大的可能为素数的第一个整数（此方法返回的数是合数的概率不超出 2-100）
             BigInteger y = egcd(totient, e)[1];
             d = y.mod(totient); //产生私钥
         }
-    public BigInteger getE() {
+        public void sete_d_n(BigInteger e,BigInteger d,BigInteger n) {
+        	this.e = e;
+        	this.d = d;
+        	this.n = n;
+        }
+        public void setp_q(BigInteger p,BigInteger q) {
+        	this.p = p;
+            this.q = q;
+        }
+        public String getp() {
+        	//TODO:
+        	return p.toString(16);
+        }
+        public String getq() {
+        	return q.toString(16);
+        }
+        public BigInteger gete() {
+        	return e;
+        }
+        public BigInteger getd() {
+        	return d;
+        }
+        public BigInteger getn() {
+        	return n;
+        }
+    public String getE() {
         // 这里以totient/4为种子，选取一个素数作为公钥
-        return totient.divide(BigInteger.valueOf(4)).nextProbablePrime();//nextProbablePrime()返回比this大的可能为素数的第一个整数（此方法返回的数是合数的概率不超出 2-100）
+        return e.toString(16);
     }
     // 扩展的Euclid算法，目的：算出e-1 mod n
+    public String getD() {	
+    	return d.toString(16);
+    }
+    public String getN() {
+    	return n.toString(16);
+    }
     public static BigInteger[] egcd(BigInteger d1, BigInteger d2) {
         BigInteger[] ret = new BigInteger[3];
         BigInteger u = BigInteger.valueOf(1), u1 = BigInteger.valueOf(0);
@@ -59,13 +90,14 @@ public class RSA {
     public BigInteger decode(BigInteger c) {
         return c.modPow(this.d, this.n);
     }
-    public BigInteger findp_q(int bitLength, Random rnd){
-            BigInteger p=null;
-            p=BigInteger.probablePrime(bitLength,rnd);
-            return p;
+    public void findp(int bitLength){//此处bitLength并不是二进制位长，而是十六进制数的位长
+            this.p=BigInteger.probablePrime(bitLength*4,new Random());
     }
-/*    public String loadPrivateKeyByFile(String path){
+    public void findq(int bitLength){
+        this.q=BigInteger.probablePrime(bitLength*4,new Random());
+}
+public static void main(String[] args) {
 
-    }*/
+}
 }
 

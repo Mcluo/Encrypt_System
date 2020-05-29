@@ -28,6 +28,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.awt.event.ItemEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 public class encrypt_frame extends JFrame {
 
@@ -35,7 +37,7 @@ public class encrypt_frame extends JFrame {
     public static JTextField InputFile;
 	public static JTextField OutputFile;
 	private JTextField TolerantPath_text;
-	public static JTextField DESKey_text,AESKey_text,InputFile_RSA;
+	public static JTextField DESKey_text,AESKey_text,RSAkey_text;
 	private JTextField DESKeyConfirm_text;
 	public static int Mode;
 	private JTextField AESKeyConfirm;
@@ -43,7 +45,10 @@ public class encrypt_frame extends JFrame {
 	public static JRadioButton DES_rBtn;
 	public static JRadioButton AES_rBtn;
 	public static JRadioButton RSA_rBtn;
-	private JTextField textField;
+	public static JButton Enc_Btn;
+	public static JLabel RSAkey_Lab,n_Lab;
+	public static JTextField n_text;
+
 	/**
 	 * Launch the application.
 	 */
@@ -64,6 +69,7 @@ public class encrypt_frame extends JFrame {
 	 * Create the frame.
 	 */
 	public encrypt_frame() {
+		setSize(new Dimension(500, 763));
 		setTitle("DES/AES/RSA\u52A0\u89E3\u5BC6");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -87,7 +93,7 @@ public class encrypt_frame extends JFrame {
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new TitledBorder(null, "\u9009\u9879", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		JButton Enc_Btn = new JButton("\u52A0\u5BC6");
+	    Enc_Btn = new JButton("\u52A0\u5BC6");
 		/**
 		 * 点击加密按钮执行指定的加密算法和操作
 		 */
@@ -95,6 +101,7 @@ public class encrypt_frame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					File_Obj fo = new File_Obj();
+					fo.CryptBtn();
 					
 				} catch (IOException e1) {
 					// TODO 自动生成的 catch 块
@@ -111,9 +118,18 @@ public class encrypt_frame extends JFrame {
 			}
 		});
 		Exit_Btn.setFont(new Font("宋体", Font.PLAIN, 15));
+		
+		JButton createkey_Btn = new JButton("\u4EA7\u751FRSA\u5BC6\u94A5\u5BF9");
+		createkey_Btn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				keyproduction_frame f = new keyproduction_frame();
+				f.setVisible(true);
+			}
+		});
+		createkey_Btn.setFont(new Font("宋体", Font.PLAIN, 15));
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.TRAILING)
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGap(2)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
@@ -122,17 +138,20 @@ public class encrypt_frame extends JFrame {
 						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE))
 					.addContainerGap())
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGap(82)
+					.addGap(34)
 					.addComponent(Enc_Btn, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
-					.addGap(70)
+					.addGap(33)
+					.addComponent(createkey_Btn)
+					.addPreferredGap(ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
 					.addComponent(Exit_Btn, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(142, Short.MAX_VALUE))
-				.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+					.addGap(42))
+				.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 486, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
-				.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
-					.addGap(2))
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 484, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(30, Short.MAX_VALUE))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -144,13 +163,14 @@ public class encrypt_frame extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(Enc_Btn)
-						.addComponent(Exit_Btn))
+						.addComponent(Exit_Btn)
+						.addComponent(createkey_Btn))
 					.addContainerGap())
 		);
 		
@@ -158,6 +178,8 @@ public class encrypt_frame extends JFrame {
 		label_1.setBounds(10, 40, 48, 15);
 		label_1.setFont(new Font("宋体", Font.PLAIN, 12));
 		 DES_rBtn = new JRadioButton("DES\u52A0\u5BC6");
+		 JButton importkey_btn = new JButton("\u5BFC\u5165");
+			JButton importn_btn = new JButton("\u5BFC\u5165");
 		DESKey_text = new JTextField();
 		DES_rBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -165,7 +187,10 @@ public class encrypt_frame extends JFrame {
 			DESKeyConfirm_text.setEnabled(true);
 				AESKey_text.setEnabled(false);
 				AESKeyConfirm.setEnabled(false);
-				InputFile_RSA.setEnabled(false);
+				RSAkey_text.setEnabled(false);
+				createkey_Btn.setEnabled(false);
+				importkey_btn.setEnabled(false);
+				importn_btn.setEnabled(false);
 			}
 		});
 		DES_rBtn.setBounds(58, 38, 71, 25);
@@ -178,7 +203,10 @@ public class encrypt_frame extends JFrame {
 			DESKeyConfirm_text.setEnabled(false);
 			AESKey_text.setEnabled(true);
 				AESKeyConfirm.setEnabled(true);
-			InputFile_RSA.setEnabled(false);
+			RSAkey_text.setEnabled(false);
+			createkey_Btn.setEnabled(false);
+			importkey_btn.setEnabled(false);
+			importn_btn.setEnabled(false);
 			}
 		});
 		AES_rBtn.setBounds(130, 38, 71, 25);
@@ -191,7 +219,10 @@ public class encrypt_frame extends JFrame {
 			DESKeyConfirm_text.setEnabled(false);
 			AESKey_text.setEnabled(false);
 				AESKeyConfirm.setEnabled(false);
-			InputFile_RSA.setEnabled(true);
+			RSAkey_text.setEnabled(true);
+			createkey_Btn.setEnabled(true);
+			importkey_btn.setEnabled(true);
+			importn_btn.setEnabled(true);
 			}
 		});
 		RSA_rBtn.setBounds(201, 38, 71, 25);
@@ -278,17 +309,21 @@ public class encrypt_frame extends JFrame {
 		);
 		panel_3.setLayout(gl_panel_3);
 		
-		InputFile_RSA = new JTextField();
-		InputFile_RSA.setColumns(10);
+		RSAkey_text = new JTextField();
+		RSAkey_text.setEditable(false);
+		RSAkey_text.setColumns(10);
 		
-		JLabel lblNewLabel_2 = new JLabel("\u516C\u94A5");
-		lblNewLabel_2.setFont(new Font("宋体", Font.PLAIN, 12));
+		RSAkey_Lab = new JLabel("\u5BC6\u94A5");
+		RSAkey_Lab.setFont(new Font("宋体", Font.PLAIN, 12));
 		
-		JLabel lblNewLabel_2_1 = new JLabel("\u79C1\u94A5");
-		lblNewLabel_2_1.setFont(new Font("宋体", Font.PLAIN, 12));
 		
-		textField = new JTextField();
-		textField.setColumns(10);
+		
+		n_Lab = new JLabel("\u6A21\u6570");
+		n_Lab.setFont(new Font("宋体", Font.PLAIN, 12));
+		
+		n_text = new JTextField();
+		n_text.setEditable(false);
+		n_text.setColumns(10);
 		
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
@@ -296,30 +331,35 @@ public class encrypt_frame extends JFrame {
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
 					.addContainerGap()
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(n_Lab, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(RSAkey_Lab, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-							.addGap(6)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(InputFile_RSA, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(118, Short.MAX_VALUE))
+							.addComponent(RSAkey_text, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(importkey_btn))
+						.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(n_text, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(importn_btn, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(23, Short.MAX_VALUE))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
 					.addGap(10)
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
-						.addComponent(InputFile_RSA, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addGap(5)
-							.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE))
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+						.addComponent(RSAkey_text, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(importkey_btn)
+						.addComponent(RSAkey_Lab, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+						.addComponent(n_text, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(importn_btn)
+						.addComponent(n_Lab, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_2.setLayout(gl_panel_2);
@@ -401,7 +441,25 @@ public class encrypt_frame extends JFrame {
 					String prefix = oldPath.substring(oldPath.lastIndexOf("."));
 					String newPath = new String();
 					if (prefix.equals(".des")||(prefix.equals(".aes"))||(prefix.equals(".rsa"))) {
-						Mode = 1;//判断是解密
+						if(prefix.equals(".des")) {
+						Mode = 1;//判断是DES解密
+						AESKey_text.setEnabled(false);
+						AESKeyConfirm.setEnabled(false);
+						RSAkey_text.setEnabled(false);
+						}
+						if(prefix.equals(".aes")) {
+							Mode = 2;//判断是AES解密
+							DESKey_text.setEnabled(false);
+							DESKeyConfirm_text.setEnabled(false);
+							RSAkey_text.setEnabled(false);
+						}
+						if(prefix.equals(".rsa")) {
+							Mode =3;//判断是RSA解密
+							AESKey_text.setEnabled(false);
+							AESKeyConfirm.setEnabled(false);
+							DESKey_text.setEnabled(false);
+							DESKeyConfirm_text.setEnabled(false);
+						}
 					label_1.setEnabled(false);
 					DES_rBtn.setEnabled(false);
 					AES_rBtn.setEnabled(false);
