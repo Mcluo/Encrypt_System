@@ -39,7 +39,7 @@ public class MainFrame extends JFrame {
 		// setLocation(200,200);
 		setBounds(500, 200, 500, 277);
 
-		// setContentPane(panel1);//获取窗体容器
+//		 setContentPane(panel1);//获取窗体容器
 		// setBackground(Color.white);
 		// validate();//验证容器组件（刷新）
 		// setContentPane(panel1);//重新载入容器
