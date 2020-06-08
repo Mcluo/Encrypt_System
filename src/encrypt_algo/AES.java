@@ -299,13 +299,9 @@ public class AES {
 		return c;
 	}
 
-	public int[] AESDeEncrypt(byte[] ctext, String keytext) throws DataFormatException {
+	public int[] AESDeEncrypt(byte[] ctext, String keytext)  {
 		// TODO 自动生成的方法存根
 		int n = ctext.length / 16;
-		if (ctext.length % 16 != 0) {
-			DataFormatException e = new DataFormatException();
-			throw e;
-		}
 		int[] m = new int[n * 16];
 		setKey(keytext);
 		for (int i = 0; i < n - 1; i++) {

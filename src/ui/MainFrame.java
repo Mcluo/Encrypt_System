@@ -63,8 +63,7 @@ public class MainFrame extends JFrame {
 				}
 
 				if (radioButton_1.isSelected()) {
-					DigSign_frame df = new DigSign_frame();
-					df.setVisible(true);
+					DigSign_frame.run();
 				}
 
 			}
@@ -121,7 +120,7 @@ public class MainFrame extends JFrame {
 		getContentPane().setLayout(groupLayout);
 	}
 
-	public ImageIcon setImageIconSize(String path, int width, int height) {
+	public  ImageIcon setImageIconSize(String path, int width, int height) {
 		if (width == 0 || height == 0) {
 			return new ImageIcon(this.getClass().getResource(path));
 		}

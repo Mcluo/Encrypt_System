@@ -1,362 +1,363 @@
 package encrypt_algo;
 
-import java.util.Arrays;
+import java.io.IOException;
+
+import javax.swing.JOptionPane;
+
+import fileIO.File_Obj;
+import fileIO.ReadFile;
+import ui.encrypt_frame;
 
 public class DES {
-	private static final int[] replace1_C = new int[] { // 密钥置换（前28位，第8,16,24,32位被剔除）
-			57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44,
-			36 };
-	private static final int[] replace1_D = new int[] { // 密钥置换（后28位，第40,48,56,64位被剔除）
-			63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12,
-			4 };
-	private static final int[] replace2 = new int[] { // 压缩置换，replace1是密钥产生的第一步：密钥置换，replace2是密钥产生的第二步：压缩置换
-			14, 17, 11, 24, 1, 5, 3, 28, 15, 6, 21, 10, 23, 19, 12, 4, 26, 8, 16, 7, 27, 20, 13, 2, 41, 52, 31, 37, 47,
-			55, 30, 40, 51, 45, 33, 48, 44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32 };
-	private static final int[] cycle_bit = new int[] { // 16轮，循环左移
-			1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
-	private static final int[] replace_IP = new int[] { // IP置换
-			58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4, 62, 54, 46, 38, 30, 22, 14, 6, 64, 56, 48, 40,
-			32, 24, 16, 8, 57, 49, 41, 33, 25, 17, 9, 1, 59, 51, 43, 35, 27, 19, 11, 3, 61, 53, 45, 37, 29, 21, 13, 5,
-			63, 55, 47, 39, 31, 23, 15, 7 };
-	private static final int[] replace_P = new int[] { // P置换
-			16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10, 2, 8, 24, 14, 32, 27, 3, 9, 19, 13, 30, 6, 22,
-			11, 4, 25 };
-	private static final int[] replace_IPcontrary = new int[] { // IP逆置换
-			4, 8, 48, 16, 56, 24, 64, 32, 39, 7, 47, 15, 55, 23, 63, 31, 38, 6, 46, 14, 54, 22, 62, 30, 37, 5, 45, 13,
-			53, 21, 61, 29, 36, 4, 44, 12, 52, 20, 60, 28, 35, 3, 43, 11, 51, 19, 59, 27, 34, 2, 42, 10, 50, 18, 58, 26,
-			33, 1, 41, 9, 49, 17, 57, 25 };
-	private static final int[] choose_E = new int[] { // E扩展置换
-			32, 1, 2, 3, 4, 5, 4, 5, 6, 7, 8, 9, 8, 9, 10, 11, 12, 13, 12, 13, 14, 15, 16, 17, 16, 17, 18, 19, 20, 21,
-			20, 21, 22, 23, 24, 25, 24, 25, 26, 27, 28, 29, 28, 29, 30, 31, 32, 1 };
-	private static final int[][][] S = new int[][][] { // S盒代换
-			{ { 14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7 }, // S1
-					{ 0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8 },
-					{ 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0 },
-					{ 15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13 } },
+	    //初始置换
+	    private int[] IP={58,50,42,34,26,18,10,2,
+	                     60,52,44,36,28,20,12,4,
+	                     62,54,46,38,30,22,14,6,
+	                     64,56,48,40,32,24,16,8,
+	                     57,49,41,33,25,17,9,1,
+	                     59,51,43,35,27,19,11,3,
+	                     61,53,45,37,29,21,13,5,
+	                     63,55,47,39,31,23,15,7};
+	    //逆初始置换
+	    private int[] IP_1={40,8,48,16,56,24,64,32,
+	                       39,7,47,15,55,23,63,31,
+	                       38,6,46,14,54,22,62,30,
+	                       37,5,45,13,53,21,61,29,
+	                       36,4,44,12,52,20,60,28,
+	                       35,3,43,11,51,19,59,27,
+	                       34,2,42,10,50,18,58,26,
+	                       33,1,41,9,49,17,57,25};//手残，数组数据没写全
+	    //E扩展
+	    private int[] E={32,1,2,3,4,5,
+	                      4,5,6,7,8,9,
+	                     8,9,10,11,12,13,
+	                     12,13,14,15,16,17,
+	                     16,17,18,19,20,21,
+	                     20,21,22,23,24,25,
+	                     24,25,26,27,28,29,
+	                     28,29,30,31,32,1};
+	    //P置换
+	    private int[] P={16,7,20,21,29,12,28,17,
+	                      1,15,23,26,5,18,31,10,
+	                      2,8,24,14,32,27,3,9,
+	                      19,13,30,6,22,11,4,25};
+	    private static final int[][][] S_Box = {
+	            {
+	                    { 14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7 },
+	                    { 0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8 },
+	                    { 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0 },
+	                    { 15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13 } },
+	            { 
+	                    { 15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10 },
+	                    { 3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5 },
+	                    { 0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15 },
+	                    { 13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9 } },
+	            { 
+	                    { 10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8 },
+	                    { 13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1 },
+	                    { 13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7 },
+	                    { 1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12 } },
+	            { 
+	                    { 7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15 },
+	                    { 13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9 },
+	                    { 10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4 },
+	                    { 3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14 } },
+	            { 
+	                    { 2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9 },
+	                    { 14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6 },
+	                    { 4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14 },
+	                    { 11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3 } },
+	            { 
+	                    { 12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11 },
+	                    { 10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8 },
+	                    { 9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6 },
+	                    { 4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13 } },
+	            { 
+	                    { 4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1 },
+	                    { 13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6 },
+	                    { 1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2 },
+	                    { 6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12 } },
+	            { 
+	                    { 13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7 },
+	                    { 1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2 },
+	                    { 7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8 },
+	                    { 2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11 } }
+	    };
+	    //PC-1
+	    private int[] PC1={57,49,41,33,25,17,9,
+	                       1,58,50,42,34,26,18,
+	                       10,2,59,51,43,35,27,
+	                        19,11,3,60,52,44,36,
+	                       63,55,47,39,31,23,15,
+	                       7,62,54,46,38,30,22,
+	                       14,6,61,53,45,37,29,
+	                       21,13,5,28,20,12,4};
+	    //PC-2
+	    private int[] PC2={14,17,11,24,1,5,3,28,
+	                       15,6,21,10,23,19,12,4,
+	                       26,8,16,7,27,20,13,2,
+	                       41,52,31,37,47,55,30,40,
+	                       51,45,33,48,44,49,39,56,
+	                       34,53,46,42,50,36,29,32};
 
-			{ { 15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10 }, // S2
-					{ 3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5 },
-					{ 0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15 },
-					{ 13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9 } },
+	    private int[] LFT={1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1};///>16轮，循环左移
+	    /**加密轮数**/
+	    private static final int LOOP_NUM=16;///>循环加密次数
+//	    private String [] keys=new String[LOOP_NUM];
+//	    private String [] pContent;
+//	    private String [] cContent;
+	    private int origin_length;///>原始信息长度
+	    /**16个子密钥**/
+	    private int[][] sub_key=new int[16][48];///>自密钥
+	    private String content;///>信息字符串
+//	    private int p_origin_length;//补位后的信息长度
 
-			{ { 10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8 }, // S3
-					{ 13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1 },
-					{ 13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7 },
-					{ 1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12 } },
+	    public DES() {
+	    	
+	    }
 
-			{ { 7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15 }, // S4
-					{ 13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9 },
-					{ 10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4 },
-					{ 3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14 } },
+	    /****拆分分组****/
+	    public byte[] deal(byte[] p ,String key,int flag){
+	    	generateKeys(key);
+	        origin_length=p.length;
+	        int g_num;//groupnumber
+	        int r_num;//padding_length
+	        g_num=origin_length/8;      
+	        byte[] p_padding;
+	        /****填充********/
+	        if (flag==1){//信息长度不是分组的整数倍
+	        	  r_num=8-(origin_length-g_num*8);//8不填充
+	            p_padding=new byte[origin_length+r_num];
+	            System.arraycopy(p,0,p_padding,0,origin_length);
+	            for(int i=0;i<r_num;i++){
+	                p_padding[origin_length+i]=(byte)r_num;//填充的信息是填充位的长度
+	            }
+	        }
+	        else {
+	        	p_padding=new byte[origin_length];
+	        	 System.arraycopy(p,0,p_padding,0,origin_length);
+	        }
+	        g_num=p_padding.length/8;//重新赋值groupnumber
+	        byte[] f_p=new byte[8];//f_p:循环分组的容器
+	        byte[] result_data=new byte[p_padding.length];//result_data结果长度=填充后的信息长度
+	        for(int i=0;i<g_num;i++){
+	            System.arraycopy(p_padding,i*8,f_p,0,8);
+	            System.arraycopy(descryUnit(f_p,sub_key,flag),0,result_data,i*8,8);
+	        }
+	        if (flag==0){//解密
+	        	r_num = result_data[p_padding.length-1];
+	            byte[] p_result_data=new byte[origin_length-r_num];
+	            System.arraycopy(result_data,0,p_result_data,0,origin_length-r_num);
+	            return  p_result_data;//解密结果
+	        }
+	        return result_data;//加密结果
 
-			{ { 2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9 }, // S5
-					{ 14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6 },
-					{ 4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14 },
-					{ 11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3 } },
+	    }
+	    /**
+	     * 加密
+	     * **/
+	    public byte[] descryUnit(byte[] p,int k[][],int flag){
+	        int[] p_bit=new int[64];
+	        StringBuilder stringBuilder=new StringBuilder();
+	        for(int i=0;i<8;i++){
+	            String p_b=Integer.toBinaryString(p[i]&0xff);
+	            while (p_b.length()%8!=0){
+	                p_b="0"+p_b;
+	            }
+	            stringBuilder.append(p_b);
+	        }
+	        String p_str=stringBuilder.toString();
+	        for(int i=0;i<64;i++){
+	            int p_t=Integer.valueOf(p_str.charAt(i));
+	            if(p_t==48){
+	                p_t=0;
+	            }else if(p_t==49){
+	                p_t=1;
+	            }else{
+	                System.out.println("To bit error!");
+	            }
+	            p_bit[i]=p_t;
+	        }
+	        /***IP置换***/
+	        int [] p_IP=new int[64];
+	        for (int i=0;i<64;i++){
+	            p_IP[i]=p_bit[IP[i]-1];
+	        }
+	        if (flag == 1) { // 加密
+	            for (int i = 0; i < 16; i++) {
+	                L(p_IP, i, flag, k[i]);
+	            }
+	        } else if (flag == 0) { // 解密
+	            for (int i = 15; i > -1; i--) {
+	                L(p_IP, i, flag, k[i]);
+	            }
+	        }
+	        int[] c=new int[64];
+	        for(int i=0;i<IP_1.length;i++){
+	            c[i]=p_IP[IP_1[i]-1];
+	        }
+	        byte[] c_byte=new byte[8];
+	        for(int i=0;i<8;i++){
+	            c_byte[i]=(byte) ((c[8*i]<<7)+(c[8*i+1]<<6)+(c[8*i+2]<<5)+(c[8*i+3]<<4)+(c[8*i+4]<<3)+(c[8*i+5]<<2)+(c[8*i+6]<<1)+(c[8*i+7]));
+	        }
+	        return c_byte;
 
-			{ { 12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11 }, // S6
-					{ 10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8 },
-					{ 9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6 },
-					{ 4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13 } },
 
-			{ { 4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1 }, // S7
-					{ 13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6 },
-					{ 1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2 },
-					{ 6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12 } },
+	    }
+	    private void L(int[] M, int times, int flag, int[] keyarray){
+	        int[] L0=new int[32];
+	        int[] R0=new int[32];
+	        int[] L1=new int[32];
+	        int[] R1=new int[32];
+	        int[] f=new int[32];
+	        System.arraycopy(M,0,L0,0,32);
+	        System.arraycopy(M,32,R0,0,32);
+	        L1=R0;
+	        f=fFuction(R0,keyarray);
+	        for(int j=0;j<32;j++){
+	                R1[j]=L0[j]^f[j];
+	                if (((flag == 0) && (times == 0)) || ((flag == 1) && (times == 15))) {
+	                    M[j] = R1[j];
+	                    M[j + 32] = L1[j];
+	                }
+	                else {
+	                    M[j] = L1[j];
+	                    M[j + 32] = R1[j];
+	                }
+	        }
 
-			{ { 13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7 }, // S8
-					{ 1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2 },
-					{ 7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8 },
-					{ 2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11 } } };
+	    }
 
-	private int[] key = new int[64];// TODO:位运算为什么申明64为int空间
-	private int[][] key_child = new int[16][48];
-	private int[] M = new int[64];
-	private int[] C = new int[64];
-	private boolean debug = false;
 
-	private void leftbit(int[] Array, int n) {
-		for (int i = 0; i < n; i++) {
-			int temp = Array[0];
-			for (int j = 0; j < 27; j++) {
-				Array[j] = Array[j + 1];
-			}
-			Array[27] = temp;
-		}
+
+	    private int[] fFuction(int [] r_content,int [] key){
+	        int[] result=new int[32];
+	        int[] e_k=new int[48];
+	        for(int i=0;i<E.length;i++){
+	            e_k[i]=r_content[E[i]-1]^key[i];
+	        }
+	        /********S盒替换:由48位变32位，现分割e_k，然后再进行替换*********/
+	        int[][] s=new int[8][6];
+	        int[]s_after=new int[32];
+	        for(int i=0;i<8;i++){
+	            System.arraycopy(e_k,i*6,s[i],0,6);
+	            int r=(s[i][0]<<1)+ s[i][5];//横坐标
+	            int c=(s[i][1]<<3)+(s[i][2]<<2)+(s[i][3]<<1)+s[i][4];//纵坐标
+	            String str=Integer.toBinaryString(S_Box[i][r][c]);
+	            while (str.length()<4){
+	                str="0"+str;
+	            }
+	            for(int j=0;j<4;j++){
+	                int p=Integer.valueOf(str.charAt(j));
+	                if(p==48){
+	                    p=0;
+	                }else if(p==49){
+	                    p=1;
+	                }else{
+	                    System.out.println("To bit error!");
+	                }
+	                s_after[4*i+j]=p;
+	            }
+
+	        }
+	        /******S盒替换结束*******/
+	        /****P盒替代****/
+	        for(int i=0;i<P.length;i++){
+	            result[i]=s_after[P[i]-1];
+	        }
+	        return result;
+
+	    }
+
+	    /**
+	     * 生成子密钥
+	     **/
+	    public void generateKeys(String key){
+//	        while (key.length()<8){
+//	            key=key+key;
+//	        }
+//	        key=key.substring(0,8);
+	        byte[] keys=key.getBytes();
+	        int[] k_bit=new int[64];
+	        //取位值
+	        for(int i=0;i<8;i++){
+	            String k_str=Integer.toBinaryString(keys[i]&0xff);
+	            if(k_str.length()<8){
+	            	int k = k_str.length();
+	                for(int t=0;t<8-k;t++){
+	                    k_str="0"+k_str;
+	                }
+	            }
+	            for(int j=0;j<8;j++){
+	                int p=Integer.valueOf(k_str.charAt(j));
+	                if(p==48){
+	                    p=0;
+	                }else if(p==49){
+	                    p=1;
+	                }else{
+	                    System.out.println("To bit error!");
+	                }
+	                k_bit[i*8+j]=p;
+	            }
+	        }
+	        //k_bit是初始的64位长密钥，下一步开始进行替换
+	        /***********PC-1压缩****************/
+	        int [] k_new_bit=new int[56];
+	        for(int i=0;i<PC1.length;i++){
+	            k_new_bit[i]=k_bit[PC1[i]-1];/////这个减1注意点
+	        }
+	        /**************************/
+	        int[] c0=new int[28];
+	        int[] d0=new int[28];
+	        System.arraycopy(k_new_bit,0,c0,0,28);
+	        System.arraycopy(k_new_bit,28,d0,0,28);
+	        for(int i=0;i<16;i++){
+	            int[] c1=new int[28];
+	            int[] d1=new int[28];
+	            if(LFT[i]==1){
+	                System.arraycopy(c0,1,c1,0,27);
+	                c1[27]=c0[0];
+	                System.arraycopy(d0,1,d1,0,27);
+	                d1[27]=d0[0];
+	            }else if(LFT[i]==2){
+	                System.arraycopy(c0,2,c1,0,26);
+	                c1[26]=c0[0];
+	                c1[27]=c0[1];//这里手残之前写成c1
+
+	                System.arraycopy(d0,2,d1,0,26);
+	                d1[26]=d0[0];
+	                d1[27]=d0[1];
+	            }else{
+	                System.out.println("LFT Error!");
+	            }
+	            int[] tmp=new int[56];
+	            System.arraycopy(c1,0,tmp,0,28);
+	            System.arraycopy(d1,0,tmp,28,28);
+	            for (int j=0;j<PC2.length;j++){//PC2压缩置换
+	                sub_key[i][j]= tmp[PC2[j]-1];
+	            }
+	            c0=c1;
+	            d0=d1;
+	        }
+
+	    }
+
+
+	    public static void main(String[] args) throws IOException{
+	    	ReadFile f1 = new ReadFile();
+				File_Obj.Mtobyte = f1.getContent(File_Obj.getProjectpath()+"\\file\\测试文件2.txt");
+				System.out.println("明文：\n"+new String(File_Obj.Mtobyte));
+	        DES DES=new DES();
+//	        String Ms = "12345678123456781234";
+//	        byte[] M = Ms.getBytes();
+	        byte[] c=DES.deal(File_Obj.Mtobyte,"12345678",1);
+	        //byte[] c=DES.deal(origin.getBytes(),1);
+	        System.out.println("密文：\n"+new String(c));
+	        byte[]p=DES.deal(c,"12345678",0);
+//	        byte[] p_d=new byte[origin.getBytes().length];
+//	                System.arraycopy(p,0,p_d,0,origin.getBytes().length);
+	        System.out.println("明文：\n"+new String(p));
+
+	    }
 	}
 
-//	public void HEX_to_int(String a, int b[]) {// 把ox'1234'转换成二进制表示(int类型)：0001001000110100；本来想用api直接实现进制转换，但这个是按位进行进制转换，没有找到对应的api；其实想想，最朴素的方法的效率还是可能高于api的。
-//		char[] A = a.toCharArray();
-//		int temp;
-//		for (int i = 0; i < 16; i++) {
-//			if (A[i] <= '9') {
-//				temp = A[i] - '0';
-//			} else if (A[i] <= 'F') {
-//				temp = A[i] - 'A' + 10;
-//			} else {
-//				temp = A[i] - 'a' + 10;
-//			}
-//			b[i * 4 + 3] = temp & 1;
-//			b[i * 4 + 2] = (temp & 2) / 2;
-//			b[i * 4 + 1] = (temp & 4) / 4;
-//			b[i * 4] = (temp & 8) / 8;
-//		}
-//	}
-
-	public void setKey(int[] KEY) { // 秘钥KEY 表现为一个16位16进制数
-		int[] C0 = new int[28];
-		int[] D0 = new int[28];
-		for (int i = 0; i < 28; i++) {
-			C0[i] = KEY[replace1_C[i] - 1];// -1是因为置换表是从1开始的
-			D0[i] = KEY[replace1_D[i] - 1];
-		}
-
-		for (int i = 0; i < 16; i++) {// 16轮
-			int n = cycle_bit[i];
-			leftbit(C0, n);
-			leftbit(D0, n);
-
-			for (int j = 0; j < 48; j++) {
-				if (replace2[j] <= 28) {
-					key_child[i][j] = C0[replace2[j] - 1];
-				} else {
-					key_child[i][j] = D0[replace2[j] - 29];
-				}
-			}
-		}
-	}
-
-	public void setC(int[] ciphertext) { // 密文cipherext 表现为一个16位16进制数
-		int[][] L = new int[17][32];
-		int[][] R = new int[17][32];
-		for (int i = 0; i < 32; i++) { // 初始置换IP
-			L[0][i] = C[replace_IP[i] - 1];
-			R[0][i] = C[replace_IP[i + 32] - 1];
-		}
-		for (int i = 1; i <= 16; i++) { // 16次加密
-			for (int j = 0; j < 32; j++) { // 对L赋值
-				L[i][j] = R[i - 1][j];
-			}
-			int[] temp48 = new int[48]; // 进行选择运算E将32位扩至48位
-			for (int j = 0; j < 48; j++) {
-				temp48[j] = R[i - 1][choose_E[j] - 1] ^ key_child[16 - i][j];
-			}
-			int[] temp32 = new int[32];
-			for (int j = 0; j < 8; j++) { // 8个S盒子
-				int x, y, t;
-				x = temp48[j * 6] * 2 + temp48[j * 6 + 5];
-				y = temp48[j * 6 + 1] * 8 + temp48[j * 6 + 2] * 4 + temp48[j * 6 + 3] * 2 + temp48[j * 6 + 4];
-				t = S[j][x][y];
-				temp32[j * 4] = (t & 8) / 8;
-				temp32[j * 4 + 1] = (t & 4) / 4;
-				temp32[j * 4 + 2] = (t & 2) / 2;
-				temp32[j * 4 + 3] = t & 1;
-			}
-			int[] f_result = new int[32];
-			for (int j = 0; j < 32; j++) {
-				f_result[j] = temp32[replace_P[j] - 1]; // 置换运算P
-				R[i][j] = f_result[j] ^ L[i - 1][j]; // 对R进行赋值
-			}
-
-			if (debug) {
-				int l = 0;
-				System.out.printf("L%d : ", i);
-				while (l < 32) {
-					System.out.print(L[i][l]);
-					l++;
-				}
-				System.out.print('\n');
-				l = 0;
-				System.out.printf("R%d : ", i);
-				while (l < 32) {
-					System.out.print(R[i][l]);
-					l++;
-				}
-				System.out.print('\n');
-			}
-		} // 16次加密完成
-		for (int i = 0; i < 64; i++) { // 逆初始置换生成64位密文
-			int k = replace_IPcontrary[i] - 1;
-			if (k <= 31) {
-				M[i] = R[16][k];
-			} else {
-				M[i] = L[16][k - 32];
-			}
-		}
-	}
-
-	public void setM(int[] plaintext) { // 明文plaintext 表现为一个16位16进制数
-		int[][] L = new int[17][32];
-		int[][] R = new int[17][32];
-		for (int i = 0; i < 32; i++) { // 初始置换IP
-			L[0][i] = M[replace_IP[i] - 1];
-			R[0][i] = M[replace_IP[i + 32] - 1];
-		}
-		for (int i = 1; i <= 16; i++) { // 16次加密
-			for (int j = 0; j < 32; j++) { // 对L赋值
-				L[i][j] = R[i - 1][j];
-			}
-			int[] temp48 = new int[48]; // 进行选择运算E将32位扩至48位
-			for (int j = 0; j < 48; j++) {
-				temp48[j] = R[i - 1][choose_E[j] - 1] ^ key_child[i - 1][j];
-			}
-			int[] temp32 = new int[32];
-			for (int j = 0; j < 8; j++) { // 8个S盒子
-				int x, y, t;
-				x = temp48[j * 6] * 2 + temp48[j * 6 + 5];
-				y = temp48[j * 6 + 1] * 8 + temp48[j * 6 + 2] * 4 + temp48[j * 6 + 3] * 2 + temp48[j * 6 + 4];
-				t = S[j][x][y];
-				temp32[j * 4] = (t & 8) / 8;
-				temp32[j * 4 + 1] = (t & 4) / 4;
-				temp32[j * 4 + 2] = (t & 2) / 2;
-				temp32[j * 4 + 3] = t & 1;
-			}
-			int[] f_result = new int[32];
-			for (int j = 0; j < 32; j++) {
-				f_result[j] = temp32[replace_P[j] - 1]; // 置换运算P
-				R[i][j] = f_result[j] ^ L[i - 1][j]; // 对R进行赋值
-			}
-
-			if (debug) {
-				int l = 0;
-				System.out.printf("L%d : ", i);
-				while (l < 32) {
-					System.out.print(L[i][l]);
-					l++;
-				}
-				System.out.print('\n');
-				l = 0;
-				System.out.printf("R%d : ", i);
-				while (l < 32) {
-					System.out.print(R[i][l]);
-					l++;
-				}
-				System.out.print('\n');
-			}
-		} // 16次加密完成
-		for (int i = 0; i < 64; i++) { // 逆初始置换生成64位密文
-			int k = replace_IPcontrary[i] - 1;
-			if (k <= 31) {
-				C[i] = R[16][k];
-			} else {
-				C[i] = L[16][k - 32];
-			}
-		}
-	}
-
-	public int[] get_key_child(int n) { // 返回第 n 个子秘钥
-		return key_child[n - 1];
-	}
-
-	public int[] get_M() { // 返回明文
-		return M;
-	}
-
-	public int[] get_C() { // 返回密文
-		return C;
-	}
-
-	public void setDebug(boolean a) { // 设置是否显示L、R信息
-		debug = a;
-	}
-
-	public static void hex_output(int a[]) {// 最后密钥，明文，密文都要以十六进制的形式输出。
-		for (int i = 0; i < 16; i++) {
-			int hex = 0;
-			hex = 8 * a[i * 4] + 4 * a[i * 4 + 1] + 2 * a[i * 4 + 2] + a[i * 4 + 3];
-			System.out.printf("%x", hex);
-		}
-		System.out.print('\n');
-	}
-
-	public static String str_out(int a[]) {
-		char[] c = new char[16];
-		for (int i = 0; i < 16; i++) {
-			int hex = 0;
-			hex = 8 * a[i * 4] + 4 * a[i * 4 + 1] + 2 * a[i * 4 + 2] + a[i * 4 + 3];
-			if (hex < 10) {
-				c[i] = (char) ('0' + hex);// '0'+hex是ASCII码值（ASCII码表的组成是一个ASCII码值（可以用不同进制表示）对应一个字符）
-			} else {
-				c[i] = (char) ('a' + hex - 10);
-			}
-		}
-		return String.valueOf(c);
-	}
-
-	public DES() {
-
-	}
-
-	public int[] DESEncrypt(int[] Mtext, int[] Keytext) {
-		int n = Mtext.length / 64;
-		int[] c = new int[(n + 1) * 64];
-		setKey(Keytext);
-		n = n + 1;
-		for (int i = 0; i < n - 1; i++) {
-			M = Arrays.copyOfRange(Mtext, i * 64, (i + 1) * 64);
-			setM(M);
-			for (int j = 0; j < 64; j++) {
-				c[j + i * 64] = C[j];
-			}
-		}
-		for (int i = 0; i < Mtext.length % 64; i++) // 最后一组明文的补位
-			M[i] = Mtext[64 * (n - 1) + i];
-		for (int j = 0; j < 56 - Mtext.length % 64; j++) {// 明文位到56位是01填充位，最后一个字节是表示填充长度。
-			if (j % 2 == 0)
-				M[Mtext.length % 64 + j] = 0;
-			else
-				M[Mtext.length % 64 + j] = 1;
-		}
-		String len = new String(Integer.toBinaryString(Mtext.length % 64));// 把填充长度表示成二进制
-		for (int k = 8 - len.length(); k < 8; k++) {
-			M[56 + k] = Integer.parseInt(len.substring(k - 8 + len.length(), k - 7 + len.length()));
-		}
-		for (int k = 0; k < 8 - len.length(); k++) {
-			M[56 + k] = 0;
-		}
-		setM(M);
-		for (int k = 0; k < 64; k++)
-			c[64 * (n - 1) + k] = C[k];
-		return c;
-	}
-
-	public int[] DESDeEncrypt(int[] Ctext, int[] Keytext) {
-		// TODO 自动生成的方法存根
-		int n = Ctext.length / 64;
-		int[] m = new int[Ctext.length];
-		setKey(Keytext);
-		for (int i = 0; i < n - 1; i++) {
-			C = Arrays.copyOfRange(Ctext, i * 64, (i + 1) * 64);
-			setC(C);
-			for (int j = 0; j < 64; j++) {
-				m[j + i * 64] = M[j];
-			}
-		}
-		C = Arrays.copyOfRange(Ctext, (n - 1) * 64, n * 64);
-		setC(C);
-		StringBuffer Fillin = new StringBuffer();
-		for (int i = 0; i < 8; i++) {// 提取补位个数
-			Fillin.append(M[56 + i]);
-		}
-		int Fi = Integer.parseInt(Fillin.toString(), 2);
-		for (int i = 0; i < 56 - Fi; i++) {
-			m[i + (n - 1) * 64] = M[i];
-		}
-		int[] m_end = new int[Ctext.length - Fi - 8];
-
-		for (int i = 0; i < Ctext.length - Fi - 8; i++)
-			m_end[i] = m[i];
-		return m_end;
-	}
-
-	public boolean DESTest(int[] Mtext, int[] Keytext) {
-		setKey(Keytext);
-		M = Mtext.clone();
-		setM(M);
-		setC(C);
-		if (Arrays.equals(M, Mtext) == true)
-			return true;
-		else
-			return false;
-	}
-}

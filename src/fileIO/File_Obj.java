@@ -20,7 +20,6 @@ public class File_Obj {
 	public byte[] PrivateKey;
 	public static int[] Mtext;
 	public static int[] Ctext;
-	public static int[] Keytext;
 	public static int[] Mtextbi;
 	public static int[] Ctextbi;
 	public static int M_len;
@@ -29,7 +28,7 @@ public class File_Obj {
 	private static RSA rsa;
 	private static MD5 md5;
 	private static SHA sha;
-
+	public static String filename;
 	public File_Obj() {
 	}
 
@@ -41,39 +40,22 @@ public class File_Obj {
 			Mtobyte = f1.getContent(encrypt_frame.InputFile.getText());// 获得文件的字节流//read()读出来的是有符号的整形
 			Mtextbi = byteArrayToBinaryintArray(Mtobyte);// 将字节流转换成二进制流（8的倍数）
 			M_len = Mtextbi.length;// 明文二进制串的长度
-			/**
-			 * 输出函数输入字节数组
-			 */
-			for (int i = 0; i < Mtobyte.length; i++)
-				System.out.print(String.valueOf(Mtobyte[i]) + ",");
-			System.out.println("");
-			/**
-			 * 测试输出
-			 */
-			System.out.println("明文二进制串的长度为:" + M_len);
 
-			// TODO:判断选择的算法
 			if (encrypt_frame.DES_rBtn.isSelected() || encrypt_frame.Mode == 1) {
 				encrypt_algo.DES des = new encrypt_algo.DES();
-				// TODO:判断密钥长度的合规，抛出异常
 				if (encrypt_frame.DESKey_text.getText().length() != 8) {
 					System.out.println("输入的密钥不是8位！");
 				}
-				Keytext = StringToBinaryintArray(encrypt_frame.DESKey_text.getText());
-				if (encrypt_frame.Mode == 0)
-					Ctextbi = des.DESEncrypt(Mtextbi, Keytext);// 得到密文的整形二进制序列
-				else
-					Ctextbi = des.DESDeEncrypt(Mtextbi, Keytext);// TODO: 当解密时要返回明文的长度，应该可以用Collections实现
-				CString = new String(toStringMethod(Ctextbi));// 将二进制序列转成String
-				Ctext = new int[CString.length() / 8];
-				/**
-				 * 测试输出
-				 */
-				System.out.println("密文二进制串的长度为：" + CString.length());
-				for (int i = 0; i < CString.length() / 8; i++) {// 按8个一组将二进制序列转成int值
-					Ctext[i] = Integer.parseInt(CString.substring(8 * i, 8 * i + 8), 2);
+				String Keytext = encrypt_frame.DESKey_text.getText();
+				if (encrypt_frame.Mode == 0) {
+					Ctobyte = des.deal(Mtobyte, Keytext, 1);// 得到密文的整形二进制序列
+					filename = encrypt_frame.selectedFilename+ ".des";
 				}
-				Ctobyte = intArrayTobyteArray(Ctext);
+				else {
+					Ctobyte = des.deal(Mtobyte, Keytext,0);// TODO: 当解密时要返回明文的长度，应该可以用Collections实现
+				CString = new String(Ctobyte);// 将二进制序列转成String
+				filename = encrypt_frame.selectedFilename.substring(0,encrypt_frame.selectedFilename.length()-4);
+				}
 			}
 
 			else if (encrypt_frame.AES_rBtn.isSelected() || encrypt_frame.Mode == 2) {
@@ -83,10 +65,11 @@ public class File_Obj {
 				}
 				if (encrypt_frame.Mode == 0) {
 					Ctext = aes.AESEncrypt(Mtobyte, encrypt_frame.AESKey_text.getText());// 得到密文的整形序列
+					filename = encrypt_frame.selectedFilename+ ".aes";
 				} else
 					try {
-						Ctext = aes.AESDeEncrypt(Mtobyte, encrypt_frame.AESKey_text.getText());// TODO:
-																								// 当解密时要返回明文的长度，应该可以用Collections实现
+						Ctext = aes.AESDeEncrypt(Mtobyte, encrypt_frame.AESKey_text.getText());
+						filename = encrypt_frame.selectedFilename.substring(0,encrypt_frame.selectedFilename.length()-4);		
 					} catch (Exception e) {
 						System.out.println("--Exception--");
 					}
@@ -95,11 +78,11 @@ public class File_Obj {
 
 			else if (encrypt_frame.RSA_rBtn.isSelected() || encrypt_frame.Mode == 3) {
 				rsa = new encrypt_algo.RSA();
-				if (encrypt_frame.RSAkey_text.getText().equals(""))
+				if (encrypt_frame.RSAKey_text.getText().equals(""))
 					JOptionPane.showMessageDialog(encrypt_frame.Enc_Btn, "请生成或导入密钥对后再进行加解密操作！");
-				if (encrypt_frame.RSAkey_Lab.getText().contains("公") && !encrypt_frame.RSA_rBtn.isEnabled())
+				else if (encrypt_frame.RSAkey_Lab.getText().contains("公") && !encrypt_frame.RSA_rBtn.isEnabled())
 					JOptionPane.showMessageDialog(null, "请用私钥解密！");
-				if (encrypt_frame.RSAkey_Lab.getText().contains("私") && encrypt_frame.RSA_rBtn.isEnabled())
+				else if (encrypt_frame.RSAkey_Lab.getText().contains("私") && encrypt_frame.RSA_rBtn.isEnabled())
 					JOptionPane.showMessageDialog(null, "请用公钥加密！");
 				else {
 					n = new BigInteger(encrypt_frame.n_text.getText(), 16);
@@ -107,11 +90,13 @@ public class File_Obj {
 						JOptionPane.showMessageDialog(encrypt_frame.Enc_Btn, "文件大小超出加密范围！");
 					else {
 						if (encrypt_frame.RSA_rBtn.isSelected() && encrypt_frame.RSA_rBtn.isEnabled()) {
-							e = new BigInteger(encrypt_frame.RSAkey_text.getText(), 16);
+							e = new BigInteger(encrypt_frame.RSAKey_text.getText(), 16);
 							rsa.sete(e);
+							filename =encrypt_frame.selectedFilename+ ".rsa";
 						} else {
-							d = new BigInteger(encrypt_frame.RSAkey_text.getText(), 16);
+							d = new BigInteger(encrypt_frame.RSAKey_text.getText(), 16);
 							rsa.setd(d);
+							filename = encrypt_frame.selectedFilename.substring(0,encrypt_frame.selectedFilename.length()-4);
 						}
 						rsa.setn(n);
 						BigInteger C;
@@ -126,24 +111,24 @@ public class File_Obj {
 			/**
 			 * 输出函数输出字节数组
 			 */
-			for (int i = 0; i < Ctobyte.length; i++)
-				System.out.print(String.valueOf(Ctobyte[i]) + ",");
-			System.out.println("");
 			WriteFile f2 = new WriteFile();
+			if(!encrypt_frame.TolerantPath_Box.isSelected())
 			f2.createFile(encrypt_frame.OutputFile.getText(), Ctobyte);
-
+			else {
+				f2.createFile(encrypt_frame.TolerantPath_text.getText()+"\\"+filename, Ctobyte);
 		}
+	}
 	}
 
 	public void SignBtn() throws IOException {
 		ReadFile f1 = new ReadFile();
 		if (DigSign_frame.inputFile.getText().equals(""))
 			JOptionPane.showMessageDialog(null, "未键入输入文件路径！");
-		if (DigSign_frame.RSAkey_text.getText().equals(""))
+		else if (DigSign_frame.RSAKey_text.getText().equals(""))
 			JOptionPane.showMessageDialog(null, "未输入签名密钥！");
-		if (DigSign_frame.n_text.getText().equals(""))
+		else if (DigSign_frame.n_text.getText().equals(""))
 			JOptionPane.showMessageDialog(null, "未指定签名模数！");
-		if (DigSign_frame.RSAkey_Lab.getText().contains("公"))
+		else if (DigSign_frame.RSAkey_Lab.getText().contains("公"))
 			JOptionPane.showMessageDialog(null, "请使用私钥签名！");
 		else {
 			Mtobyte = f1.getContent(DigSign_frame.inputFile.getText());
@@ -152,6 +137,7 @@ public class File_Obj {
 				md5.digest(Mtobyte);
 				Signbyte = md5.outbyteArray();
 				CString = md5.outString();
+				filename = DigSign_frame.selectedFilename+".md5";
 			} else if (DigSign_frame.sha_Btn.isSelected()) {
 				sha = new SHA();
 				String MString = toStringMethod(Mtobyte);
@@ -159,10 +145,10 @@ public class File_Obj {
 				sha.encrypt(MString);
 				Signbyte = sha.toByteArray();
 				CString = sha.toString().toUpperCase();
-				System.out.println("CString:"+CString);
+				filename = DigSign_frame.selectedFilename+".sha";
 			}
 			rsa = new RSA();
-			e = new BigInteger(DigSign_frame.RSAkey_text.getText(), 16);// 此处传入的是私钥，但赋值给rsa对象的是e
+			e = new BigInteger(DigSign_frame.RSAKey_text.getText(), 16);// 此处传入的是私钥，但赋值给rsa对象的是e
 			rsa.sete(e);
 			n = new BigInteger(DigSign_frame.n_text.getText(), 16);
 			rsa.setn(n);
@@ -180,12 +166,11 @@ public class File_Obj {
 				Ctobyte[i + Mtobyte.length] = Signenc[i];
 			Ctobyte[Signenc.length + Mtobyte.length] = Signenc_len;
 			WriteFile f2 = new WriteFile();
+			if(!DigSign_frame.TolerantPath_Box.isSelected())
 			f2.createFile(DigSign_frame.outputFile.getText(), Ctobyte);
-			/**
-			 * 检查签名的解密过程
-			 */
-			WriteFile f3 = new WriteFile();
-			f3.createFile(getProjectpath() + "\\签名.txt", Signenc);
+			else {
+				f2.createFile(DigSign_frame.Tolerantpath_text.getText()+"\\"+filename, Ctobyte);
+			}
 			md5 = null;
 			rsa = null;
 			sha = null;
@@ -210,7 +195,7 @@ public class File_Obj {
 		ReadFile f1 = new ReadFile();
 		if (DigSign_frame.inputFile.getText().equals(""))
 			JOptionPane.showMessageDialog(null, "未键入输入文件路径！");
-		if (DigSign_frame.RSAkey_text.getText().equals(""))
+		if (DigSign_frame.RSAKey_text.getText().equals(""))
 			JOptionPane.showMessageDialog(null, "未输入验证密钥！");
 		if (DigSign_frame.n_text.getText().equals(""))
 			JOptionPane.showMessageDialog(null, "未指定签名模数！");
@@ -220,7 +205,7 @@ public class File_Obj {
 			Mtobyte = f1.getContent(DigSign_frame.inputFile.getText());
 			M_len = Mtobyte.length;
 			rsa = new RSA();
-			d = new BigInteger(DigSign_frame.RSAkey_text.getText(), 16);
+			d = new BigInteger(DigSign_frame.RSAKey_text.getText(), 16);
 			rsa.setd(d);
 			n = new BigInteger(DigSign_frame.n_text.getText(), 16);
 			rsa.setn(n);
@@ -314,7 +299,27 @@ public class File_Obj {
 		}
 		return m;
 	}
-
+public static byte[] StringToByteArray(String str) {
+	char[] s = str.toCharArray();
+	int tmp;
+	int[] outin = new int[str.length()];
+	byte[] out = new byte[str.length()/2];
+	for (int i = 0; i < s.length; i++) {
+		tmp = 0;
+		if (s[i] <= '9') {
+			tmp = s[i] - '0';
+		} else if (s[i] <= 'F') {
+			tmp = s[i] - 'A' + 10;
+		} else {
+			tmp = s[i] - 'a' + 10;
+		}
+		outin[i] = tmp;
+	}
+	for (int i = 0; i < s.length/2; i++) {
+		out[i] = (byte)((outin[2*i]<<4)+outin[2*i+1]);
+	}
+	return out;
+}
 	private static String toStringMethod(int[] arr) {
 		// 自定义一个字符缓冲区，
 		StringBuilder sb = new StringBuilder();
@@ -325,10 +330,11 @@ public class File_Obj {
 		return sb.toString();
 	}
 
-	private static String toStringMethod(byte[] arr) {
+	public static String toStringMethod(byte[] arr) {
 		String sb ="";
 		for (int i = 0; i < arr.length; i++) {
-			sb+=Integer.toHexString(0xFF&arr[i]);
+			sb+=Integer.toHexString(0x0F&arr[i]>>4);
+			sb+=Integer.toHexString(0x0F&arr[i]);
 		}
 		return sb;
 	}

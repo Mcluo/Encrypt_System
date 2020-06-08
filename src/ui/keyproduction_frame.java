@@ -99,7 +99,7 @@ public class keyproduction_frame extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				if(encrypt_frame.RSA_rBtn!=null) {
 				if (encrypt_frame.RSA_rBtn.isSelected() && encrypt_frame.RSA_rBtn.isEnabled()) {
-					encrypt_frame.RSAkey_text.setText(e_text.getText());
+					encrypt_frame.RSAKey_text.setText(e_text.getText());
 					File_Obj.e = rsa.gete();
 					if (rsa.gete() == null)
 						JOptionPane.showMessageDialog(Createp_btn, "还未指定密钥，导入失败！");
@@ -108,7 +108,7 @@ public class keyproduction_frame extends JDialog {
 				} else if (!encrypt_frame.RSA_rBtn.isSelected() && encrypt_frame.RSA_rBtn.isEnabled())
 					JOptionPane.showMessageDialog(inputkey_Btn, "请先在加/解密界面选择加密模式！");
 				else {
-					encrypt_frame.RSAkey_text.setText(d_text.getText());
+					encrypt_frame.RSAKey_text.setText(d_text.getText());
 					File_Obj.d = rsa.getd();
 					if (rsa.getd() == null)
 						JOptionPane.showMessageDialog(Createp_btn, "还未指定密钥，导入失败！");
@@ -118,7 +118,7 @@ public class keyproduction_frame extends JDialog {
 			}
 				else if(DigSign_frame.veri_Btn!=null) {
 					if(DigSign_frame.veri_Btn.isSelected()) {
-						DigSign_frame.RSAkey_text.setText(e_text.getText());
+						DigSign_frame.RSAKey_text.setText(e_text.getText());
 					File_Obj.e = rsa.gete();
 					if (rsa.gete() == null)
 						JOptionPane.showMessageDialog(Createp_btn, "还未指定密钥，导入失败！");
@@ -126,7 +126,7 @@ public class keyproduction_frame extends JDialog {
 						DigSign_frame.RSAkey_Lab.setText("公钥(" + rsa.getE().length() + ")");
 					}
 					else {
-						DigSign_frame.RSAkey_text.setText(d_text.getText());
+						DigSign_frame.RSAKey_text.setText(d_text.getText());
 						File_Obj.d = rsa.getd();
 						if (rsa.getd() == null)
 							JOptionPane.showMessageDialog(Createp_btn, "还未指定密钥，导入失败！");
