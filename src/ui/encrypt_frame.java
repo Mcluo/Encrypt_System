@@ -81,6 +81,9 @@ public class encrypt_frame extends JFrame {
 	private JButton confirm_Btn,clear_Btn,clear_Btn_1,confirm_Btn_1;
 	private ImageIcon image;
 	private JPanel contentPane;
+	private JCheckBox checkBox_2;
+	private JCheckBox checkBox_3;
+	private JCheckBox checkBox_4;
 
 	/**
 	 * Create the frame.
@@ -483,12 +486,13 @@ public class encrypt_frame extends JFrame {
 		label.setBounds(284, 13, 128, 18);
 		JLabel DESkeylabel = new JLabel("");
 		DESKey_text = new JPasswordField();
-		DESKey_text.setBounds(74, 33, 191, 24);
+		DESKey_text.setEchoChar('*');
+		DESKey_text.setBounds(68, 36, 184, 24);
 		DESKey_text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
 				if(DESKey_text.getPassword().length!=0&&DESKey_text.getPassword().length!=8) {
-					DESkeylabel.setText("注：密钥长度不符合要求！");
+					DESkeylabel.setText("密钥长度不符合要求！");
 				}
 				else
 					DESkeylabel.setText("");
@@ -649,12 +653,13 @@ public class encrypt_frame extends JFrame {
 		label_2.setBounds(282, 13, 154, 18);
 		JLabel AESkeylabel = new JLabel("");
 		AESKey_text = new JPasswordField();
-		AESKey_text.setBounds(74, 33, 191, 24);
+		AESKey_text.setEchoChar('*');
+		AESKey_text.setBounds(74, 33, 178, 24);
 		AESKey_text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
 				if(AESKey_text.getPassword().length!=0&&AESKey_text.getPassword().length!=16) 
-					AESkeylabel.setText("注：密钥长度不符合要求！");
+					AESkeylabel.setText("密钥长度不符合要求！");
 				else
 					AESkeylabel.setText("");
 			}
@@ -666,7 +671,8 @@ public class encrypt_frame extends JFrame {
 		lblDes_1_1.setFont(new Font("宋体", Font.PLAIN, 12));
 		JLabel AESkeyConfirmlabel = new JLabel("");
 		AESKeyConfirm_text = new JPasswordField();
-		AESKeyConfirm_text.setBounds(74, 70, 191, 24);
+		AESKeyConfirm_text.setEchoChar('*');
+		AESKeyConfirm_text.setBounds(74, 70, 178, 24);
 		AESKeyConfirm_text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -730,17 +736,18 @@ public class encrypt_frame extends JFrame {
 		panel_2.setLayout(gl_panel_2);
 
 		JLabel lblDes = new JLabel("DES\u5BC6\u94A5");
-		lblDes.setBounds(20, 38, 48, 15);
+		lblDes.setBounds(14, 41, 48, 15);
 		lblDes.setFont(new Font("宋体", Font.PLAIN, 12));
 		DESKey_text.setColumns(10);
 
 		JLabel lblDes_1 = new JLabel("\u5BC6\u94A5\u786E\u8BA4");
-		lblDes_1.setBounds(20, 75, 48, 15);
+		lblDes_1.setBounds(14, 78, 48, 15);
 		lblDes_1.setFont(new Font("宋体", Font.PLAIN, 12));
 		JLabel DESkeyConfirmlabel = new JLabel("");
 		DESkeyConfirmlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		DESKeyConfirm_text = new JPasswordField();
-		DESKeyConfirm_text.setBounds(74, 70, 191, 24);
+		DESKeyConfirm_text.setEchoChar('*');
+		DESKeyConfirm_text.setBounds(68, 73, 184, 24);
 		DESKeyConfirm_text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -764,25 +771,40 @@ public class encrypt_frame extends JFrame {
 		panel_3.add(label_2);
 		
 
-		AESkeylabel.setBounds(303, 36, 167, 18);
+		AESkeylabel.setBounds(324, 36, 146, 18);
 		panel_3.add(AESkeylabel);
 		
 
-		AESkeyConfirmlabel.setBounds(303, 73, 167, 18);
+		AESkeyConfirmlabel.setBounds(324, 73, 146, 18);
 		panel_3.add(AESkeyConfirmlabel);
+		
+		checkBox_3 = new JCheckBox("\u663E\u793A");
+		checkBox_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(checkBox_3.isSelected())
+					AESKey_text.setEchoChar((char)0);
+				else
+					AESKey_text.setEchoChar('*');
+			}
+		});
+		checkBox_3.setFont(new Font("宋体", Font.PLAIN, 11));
+		checkBox_3.setBounds(253, 32, 51, 27);
+		panel_3.add(checkBox_3);
+		
+		checkBox_4 = new JCheckBox("\u663E\u793A");
+		checkBox_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(checkBox_4.isSelected())
+					AESKeyConfirm_text.setEchoChar((char)0);
+				else
+					AESKeyConfirm_text.setEchoChar('*');
+			}
+		});
+		checkBox_4.setFont(new Font("宋体", Font.PLAIN, 11));
+		checkBox_4.setBounds(253, 69, 51, 27);
+		panel_3.add(checkBox_4);
 		String Imagepath = "/images/\u63D0\u793A .png";
 		ImageIcon resource = setImageIconSize(Imagepath, 30, 30);
-		JRadioButton showpwd_rBtn_3 = new JRadioButton("");
-		showpwd_rBtn_3.setActionCommand("");
-		showpwd_rBtn_3.setIcon(resource);
-		showpwd_rBtn_3.setBounds(275, 32, 30, 30);
-		panel_3.add(showpwd_rBtn_3);
-		
-		JRadioButton showpwd_rBtn_4 = new JRadioButton("");
-		showpwd_rBtn_4.setActionCommand("");
-		showpwd_rBtn_4.setIcon(resource);
-		showpwd_rBtn_4.setBounds(275, 69, 30, 30);
-		panel_3.add(showpwd_rBtn_4);
 		contentPane.add(panel_1);
 		panel_1.setLayout(null);
 		panel_1.add(lblDes);
@@ -792,30 +814,38 @@ public class encrypt_frame extends JFrame {
 		panel_1.add(DESKeyConfirm_text);
 		
 		
-		DESkeylabel.setBounds(304, 36, 164, 18);
+		DESkeylabel.setBounds(328, 36, 140, 18);
 		panel_1.add(DESkeylabel);
 		
 
-		DESkeyConfirmlabel.setBounds(304, 72, 164, 18);
+		DESkeyConfirmlabel.setBounds(328, 72, 140, 18);
 		panel_1.add(DESkeyConfirmlabel);
 		
-		JRadioButton showpwd_rBtn_1 = new JRadioButton("");
-		showpwd_rBtn_1.addActionListener(new ActionListener() {
+		JCheckBox checkBox_1 = new JCheckBox("\u663E\u793A");
+		checkBox_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				if(checkBox_1.isSelected())
+					DESKey_text.setEchoChar((char)0);
+				else
+					DESKey_text.setEchoChar('*');
 			}
 		});
+		checkBox_1.setFont(new Font("宋体", Font.PLAIN, 11));
+		checkBox_1.setBounds(253, 35, 51, 27);
+		panel_1.add(checkBox_1);
 		
-		showpwd_rBtn_1.setIcon(resource);
-		showpwd_rBtn_1.setActionCommand("");
-		showpwd_rBtn_1.setBounds(275, 32, 30, 30);
-		panel_1.add(showpwd_rBtn_1);
-		
-		JRadioButton showpwd_rBtn_2 = new JRadioButton("");
-		showpwd_rBtn_2.setActionCommand("");
-		showpwd_rBtn_2.setIcon(resource);
-		showpwd_rBtn_2.setBounds(275, 62, 30, 30);
-		panel_1.add(showpwd_rBtn_2);
+		checkBox_2 = new JCheckBox("\u663E\u793A");
+		checkBox_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(checkBox_2.isSelected())
+					DESKeyConfirm_text.setEchoChar((char)0);
+				else
+					DESKeyConfirm_text.setEchoChar('*');
+			}
+		});
+		checkBox_2.setFont(new Font("宋体", Font.PLAIN, 11));
+		checkBox_2.setBounds(253, 72, 51, 27);
+		panel_1.add(checkBox_2);
 		
 		
 		panel_5.setBorder(new TitledBorder(null, "\u5B57\u7B26\u4E32\u8F93\u5165/\u8F93\u51FA", TitledBorder.LEADING, TitledBorder.TOP, null, null));
